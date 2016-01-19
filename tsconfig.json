@@ -4,9 +4,10 @@
         "target": "es5",
         "noImplicitAny": false,
         "outDir": "built",
+        "outFile": "built/cat.js",
         "rootDir": ".",
         "sourceRoot": "src",
-        "sourceMap": false
+        "sourceMap": true
     },
     "exclude": [
         "node_modules"
