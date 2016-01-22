@@ -1,19 +1,29 @@
 {
   "name": "wawayu",
   "version": "1.0.0",
-  "description": "",
-  "main": "gulpfile.js",
+  "description": "biu- ====",
+  "main": "",
+  "directories": {
+    "test": "tests"
+  },
   "dependencies": {},
   "devDependencies": {
-    "jasmine-core": "^2.4.1",
-    "karma": "^0.13.19",
-    "karma-chrome-launcher": "^0.2.2",
-    "karma-firefox-launcher": "^0.1.7",
-    "karma-jasmine": "^0.3.6"
+    "babel-cli": "^6.4.5"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "mocha --compilers js:babel-core/register 'tests/*.js'"
   },
-  "author": "",
-  "license": "ISC"
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hellmage/biu-.git"
+  },
+  "author": "Luyun Xie",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/hellmage/biu-/issues"
+  },
+  "babel": {
+    "presets": ["es2015"]
+  },
+  "homepage": "https://github.com/hellmage/biu-#readme"
 }
