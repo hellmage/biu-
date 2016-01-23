@@ -55,23 +55,23 @@ export class Line extends Shape {
         p2 = dx, q2 = xWinMax - this.p1.x,
         p3 = -dy, q3 = this.p1.y - yWinMin,
         p4 = dy, q4 = yWinMax - this.p1.y;
-    var t1 = 0, t2 = 1;
     if ((dx === 0 && (q1 <= 0 || q2 <= 0)) ||
         (dy === 0 && (q3 <= 0 || q4 <= 0)))
       return null;  // parallel and outside of window
+    var t1 = 0, t2 = 1;
     if (dx > 0) {
-      t1 = Math.max(0, q2 / p2);
-      t2 = Math.min(1, q1 / p1);
-    } else if (dx < 0) {
       t1 = Math.max(0, q1 / p1);
-      t2 = Math.min(1, q2 / p2);
+      // t2 = Math.min(1, q2 / p2);
+    } else if (dx < 0) {
+      t1 = Math.max(0, q2 / p2);
+      // t2 = Math.min(1, q1 / p1);
     }
     if (dy > 0) {
-      t1 = Math.max(0, q4 / p4);
-      t2 = Math.min(1, q3 / p3);
-    } else if (dy < 0) {
-      t1 = Math.max(0, q3 / p3);
+      // t1 = Math.max(0, q4 / p4);
       t2 = Math.min(1, q4 / p4);
+    } else if (dy < 0) {
+      // t1 = Math.max(0, q3 / p3);
+      t2 = Math.min(1, q3 / p3);
     }
     var newP1 = this.p1, newP2 = this.p2;
     if (t1 !== 0)

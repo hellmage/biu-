@@ -8,7 +8,9 @@
   },
   "dependencies": {},
   "devDependencies": {
-    "babel-cli": "^6.4.5"
+    "babel-cli": "^6.4.5",
+    "babel-preset-es2015": "^6.3.13",
+    "mocha": "^2.3.4"
   },
   "scripts": {
     "test": "mocha --compilers js:babel-core/register 'tests/*.js'"
@@ -23,7 +25,9 @@
     "url": "https://github.com/hellmage/biu-/issues"
   },
   "babel": {
-    "presets": ["es2015"]
+    "presets": [
+      "es2015"
+    ]
   },
   "homepage": "https://github.com/hellmage/biu-#readme"
 }
