@@ -1,3 +1,4 @@
+import {Fraction} from "../math/fraction"
 import {Shape, ShapeType} from "./shape"
 import {Point} from "./point"
 
@@ -16,24 +17,28 @@ export class Line extends Shape {
     // @param p: Point
     // @return number
     function region(p) {
-      if (p.x <= vp.pLeftTop.x && p.y <= vp.pLeftTop.y)
-        return 9 // 1001
-      else if (p.x <= vp.pLeftTop.x && p.y > vp.pLeftTop.y && p.y <= vp.pLeftTop.y + vp.pHeight)
-        return 1 // 0001
-      else if (p.x <= vp.pLeftTop.x && p.y > vp.pLeftTop.y + vp.pHeight)
-        return 5 // 0101
-      else if (p.x > vp.pLeftTop.x && p.x <= vp.pLeftTop.x + vp.pWidth && p.y >= vp.pLeftTop.y + vp.pHeight)
-        return 4 // 0100
-      else if (p.x > vp.pLeftTop.x + vp.pWidth && p.y >= vp.pLeftTop.y + vp.pHeight)
-        return 6 // 0110
-      else if (p.x >= vp.pLeftTop.x + vp.pWidth && p.y > vp.pLeftTop.y && p.y <= vp.pLeftTop.y + vp.pHeight)
-        return 2 // 0010
-      else if (p.x >= vp.pLeftTop.x + vp.pWidth && p.y <= vp.pLeftTop.y)
-        return 10 // 1010
-      else if (p.x > vp.pLeftTop.x && p.x <= vp.pLeftTop.x + vp.pWidth && p.y <= vp.pLeftTop.y)
-        return 8 // 1000
+      if (p.x.lte(vp.pLeftTop.x) && p.y.lte(vp.pLeftTop.y))
+        return 9; // 1001
+      else if (p.x.lte(vp.pLeftTop.x) && p.y.gt(vp.pLeftTop.y)
+               && p.y.lte(vp.pLeftTop.y.add(vp.pHeight)))
+        return 1; // 0001
+      else if (p.x.lte(vp.pLeftTop.x) && p.y.gt(vp.pLeftTop.y.add(vp.pHeight)))
+        return 5; // 0101
+      else if (p.x.gt(vp.pLeftTop.x) && p.x.lte(vp.pLeftTop.x.add(vp.pWidth))
+               && p.y.gte(vp.pLeftTop.y.add(vp.pHeight)))
+        return 4; // 0100
+      else if (p.x.gt(vp.pLeftTop.x.add(vp.pWidth)) && p.y.gte(vp.pLeftTop.y.add(vp.pHeight)))
+        return 6; // 0110
+      else if (p.x.gte(vp.pLeftTop.x.add(vp.pWidth)) && p.y.gt(vp.pLeftTop.y)
+               && p.y.lte(vp.pLeftTop.y.add(vp.pHeight)))
+        return 2; // 0010
+      else if (p.x.gte(vp.pLeftTop.x.add(vp.pWidth)) && p.y.lte(vp.pLeftTop.y))
+        return 10; // 1010
+      else if (p.x.gt(vp.pLeftTop.x) && p.x.lte(vp.pLeftTop.x.add(vp.pWidth))
+               && p.y.lte(vp.pLeftTop.y))
+        return 8; // 1000
       else
-        return 0 // 0000
+        return 0; // 0000
     }
 
     var r1 = region(this.p1), r2 = region(this.p2);
@@ -48,36 +53,36 @@ export class Line extends Shape {
   // @param vp: ViewPort
   // @return Line?
   _clipLiangBarsky(vp) {
-    var dx = this.p2.x - this.p1.x, dy = this.p2.y - this.p1.y;
-    var xWinMin = vp.pLeftTop.x, xWinMax = vp.pLeftTop.x + vp.pWidth;
-    var yWinMin = vp.pLeftTop.y, yWinMax = vp.pLeftTop.y + vp.pHeight;
-    var p1 = -dx, q1 = this.p1.x - xWinMin,
-        p2 = dx, q2 = xWinMax - this.p1.x,
-        p3 = -dy, q3 = this.p1.y - yWinMin,
-        p4 = dy, q4 = yWinMax - this.p1.y;
-    if ((dx === 0 && (q1 <= 0 || q2 <= 0)) ||
-        (dy === 0 && (q3 <= 0 || q4 <= 0)))
+    var dx = this.p2.x.sub(this.p1.x), dy = this.p2.y.sub(this.p1.y);
+    var xWinMin = vp.pLeftTop.x, xWinMax = vp.pLeftTop.x.add(vp.pWidth);
+    var yWinMin = vp.pLeftTop.y, yWinMax = vp.pLeftTop.y.add(vp.pHeight);
+    var p1 = dx.neg(), q1 = this.p1.x.sub(xWinMin),
+        p2 = dx, q2 = xWinMax.sub(this.p1.x),
+        p3 = dy.neg(), q3 = this.p1.y.sub(yWinMin),
+        p4 = dy, q4 = yWinMax.sub(this.p1.y);
+    if ((dx.equals(0) && (q1.lte(0)|| q2.lte(0))) ||
+        (dy.equals(0) && (q3.lte(0)|| q4.lte(0))))
       return null;  // parallel and outside of window
-    var t1 = 0, t2 = 1;
-    if (dx > 0) {
-      t1 = Math.max(0, q1 / p1);
-      // t2 = Math.min(1, q2 / p2);
-    } else if (dx < 0) {
-      t1 = Math.max(0, q2 / p2);
-      // t2 = Math.min(1, q1 / p1);
+    var t1 = new Fraction(0), t2 = new Fraction(1);
+    if (dx.gt(0)) {
+      t1 = q1.div(p1).max(0);
+      t2 = q2.div(p2).min(1);
+    } else if (dx.lt(0)) {
+      t1 = q2.div(p2).max(0);
+      t2 = q1.div(p1).min(1);
     }
     if (dy > 0) {
-      // t1 = Math.max(0, q4 / p4);
-      t2 = Math.min(1, q4 / p4);
+      t1 = q3.div(p3).max(t1);
+      t2 = q4.div(p4).min(t2);
     } else if (dy < 0) {
-      // t1 = Math.max(0, q3 / p3);
-      t2 = Math.min(1, q3 / p3);
+      t1 = q4.div(p4).max(t1);
+      t2 = q3.div(p3).min(t2);
     }
     var newP1 = this.p1, newP2 = this.p2;
-    if (t1 !== 0)
-      newP1 = new Point(this.p1.x + t1 * dx, this.p1.y + t1 * dy);
-    if (t2 !== 1)
-      newP2 = new Point(this.p2.x + t2 * dx, this.p2.y + t2 * dy);
+    if (t1.ne(0))
+      newP1 = new Point(this.p1.x.add(t1.mul(dx)), this.p1.y.add(t1.mul(dy)));
+    if (t2.ne(1))
+      newP2 = new Point(this.p1.x.add(t2.mul(dx)), this.p1.y.add(t2.mul(dy)));
     return new Line(newP1, newP2);
   }
 

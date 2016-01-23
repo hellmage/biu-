@@ -1,4 +1,5 @@
-import assert from "assert"
+import {assert} from "./utils/assert"
+import {Fraction} from "../src/math/fraction"
 import {Point} from "../src/shapes/point";
 import {Line} from "../src/shapes/line";
 import {ViewPort} from "../src/viewport";
@@ -26,8 +27,8 @@ describe("Line", function() {
         var l = new Line(p1, p2);
         var vp = new ViewPort(20, 20);
         var nl = l.intersect(vp);
-        assert.equal(nl.p1.equals(new Point(10, 0)), true);
-        assert.equal(nl.p2.equals(new Point(1, 0)), true);
+        assert.true(nl.p1.equals(new Point(10, 0)));
+        assert.true(nl.p2.equals(new Point(1, 0)));
       });
       it("outside -> inside -> outside", function() {
         var p1 = new Point(-10, -15);
@@ -35,8 +36,10 @@ describe("Line", function() {
         var l = new Line(p1, p2);
         var vp = new ViewPort(20, 20);
         var nl = l.intersect(vp);
-        assert.equal(nl.p1.equals(new Point(-7.5, -10)), true);
-        assert.equal(nl.p1.equals(new Point(-2.5, 10)), true);
+        var expectedP1 = new Point(new Fraction(-25, 3), -10);
+        var expectedP2 = new Point(new Fraction(-5, 3), 10);
+        assert.true(nl.p1.equals(expectedP1));
+        assert.true(nl.p2.equals(expectedP2));
       });
     });
   });

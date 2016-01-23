@@ -1,4 +1,5 @@
-import assert from "assert"
+import {assert} from "./utils/assert"
+import {Fraction} from "../src/math/fraction"
 import {Point} from "../src/shapes/point";
 import {ViewPort} from "../src/viewport";
 
@@ -19,12 +20,17 @@ describe("Point", function() {
     it("returns true if the two points are identical", function() {
       var p1 = new Point(5, 5);
       var p2 = new Point(5, 5);
-      assert.equal(p1.equals(p2), true);
+      assert.true(p1.equals(p2));
+    });
+    it("returns true if the two points with floating coordinates are identical", function() {
+      var p1 = new Point(new Fraction(-5, 3), 5);
+      var p2 = new Point(new Fraction(5, -3), 5);
+      assert.true(p1.equals(p2));
     });
     it("returns false if the two points are not identical", function() {
       var p1 = new Point(5, 5);
       var p2 = new Point(5, 6);
-      assert.equal(p1.equals(p2), false);
+      assert.false(p1.equals(p2));
     });
     it("throws exception if object other than a Point is received", function() {
       var p1 = new Point(5, 5);

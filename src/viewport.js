@@ -1,3 +1,5 @@
+import Fraction from "fraction.js"
+import assert from "assert"
 import {Point} from "./shapes/point"
 
 class EnumDirection {
@@ -17,40 +19,40 @@ export class ViewPort {
   constructor(
     sWidth,  // screen width, in pixels
     sHeight, // screen height, in pixels
-    zoomFactor=1  // range from 0 to positive infinity: (0, +INF)
+    zoomFactor=new Fraction(1)  // range from 0 to positive infinity: (0, +INF)
   ) {
-    this.sWidth = sWidth;
-    this.sHeight = sHeight;
-    this.zoomFactor = zoomFactor;
-    this.pWidth = this.sWidth * this.zoomFactor;
-    this.pHeight = this.sHeight * this.zoomFactor;
-    this.pLeftTop = new Point(-this.pWidth / 2, -this.pHeight / 2);
+    this.sWidth = new Fraction(sWidth);
+    this.sHeight = new Fraction(sHeight);
+    this.zoomFactor = new Fraction(zoomFactor);
+    this.pWidth = this.sWidth.mul(this.zoomFactor);
+    this.pHeight = this.sHeight.mul(this.zoomFactor);
+    this.pLeftTop = new Point(this.pWidth.neg().div(2), this.pHeight.neg().div(2));
   }
 
   zoom(newZoomFactor) {
-    var centerx = this.pLeftTop.x + this.pWidth / 2;
-    var centery = this.pLeftTop.y + this.pHeight / 2;
+    var centerx = this.pLeftTop.x.add(this.pWidth.div(2));
+    var centery = this.pLeftTop.y.add(this.pHeight.div(2));
     this.zoomFactor = newZoomFactor;
-    this.pWidth = this.sWidth * this.zoomFactor;
-    this.pHeight = this.sHeight * this.zoomFactor;
-    this.pLeftTop.x = centerx - this.pWidth / 2;
-    this.pLeftTop.y = centery - this.pHeight / 2;
+    this.pWidth = this.sWidth.mul(this.zoomFactor);
+    this.pHeight = this.sHeight.mul(this.zoomFactor);
+    this.pLeftTop.x = centerx.sub(this.pWidth.div(2));
+    this.pLeftTop.y = centery.sub(this.pHeight.div(2));
   }
 
   move(dir, delta) {
-    var pWidthDelta = this.pWidth * delta, pHeightDelta = this.pHeight * delta;
+    var pWidthDelta = this.pWidth.mul(delta), pHeightDelta = this.pHeight.mul(delta);
     switch (dir) {
       case Direction.UP:
-        this.pLeftTop = new Point(this.pLeftTop.x, this.pLeftTop.y - pHeightDelta);
+        this.pLeftTop = new Point(this.pLeftTop.x, this.pLeftTop.y.sub(pHeightDelta));
         break;
       case Direction.DOWN:
-        this.pLeftTop = new Point(this.pLeftTop.x, this.pLeftTop.y + pHeightDelta);
+        this.pLeftTop = new Point(this.pLeftTop.x, this.pLeftTop.y.add(pHeightDelta));
         break;
       case Direction.LEFT:
-        this.pLeftTop = new Point(this.pLeftTop.x - pWidthDelta, this.pLeftTop.y);
+        this.pLeftTop = new Point(this.pLeftTop.x.sub(pWidthDelta), this.pLeftTop.y);
         break;
       case Direction.RIGHT:
-        this.pLeftTop = new Point(this.pLeftTop.x + pWidthDelta, this.pLeftTop.y);
+        this.pLeftTop = new Point(this.pLeftTop.x.sub(pWidthDelta), this.pLeftTop.y);
         break;
       default:
         console.log("Unknown direction: " + dir);
