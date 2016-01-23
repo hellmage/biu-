@@ -12,6 +12,15 @@ export class Line extends Shape {
     this.type = ShapeType.Line;
   }
 
+  toString() {
+    return `${this.p1}->${this.p2}`;
+  }
+
+  equals(l) {
+    super.equals(l);
+    return this.p1.equals(l.p1) && this.p2.equals(l.p2);
+  }
+
   // @param vp: ViewPort
   _bCohenSutherland(vp) {
     // @param p: Point

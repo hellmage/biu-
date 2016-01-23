@@ -6,6 +6,7 @@ export class Shape {
   }
 
   // determine if two shape of the same type is logically identical
+  // subclasses MUST call super.equals(s) to ensure the type check
   // @return boolean
   equals(shape) {
     if (!('type' in shape))  // if 'shape' is null, exception is thrown anyway
