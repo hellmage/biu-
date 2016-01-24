@@ -19,11 +19,19 @@ export class Shape {
     throw "NotImplemented";
   }
 
-  // abstract
+  // return the intersected part of this shape with the viewport
+  // @abstract
   // @return
   //   - clipped object is it's (partly) inside the viewport
   //   - null if it's outside the viewport
   intersect(viewport) {
+    throw "NotImplemented";
+  }
+
+  // draw this shape on the canvas
+  // @param viewport: ViewPort
+  // @param context: the canvas 2d context
+  draw(viewport, context) {
     throw "NotImplemented";
   }
 }

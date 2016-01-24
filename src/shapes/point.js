@@ -2,7 +2,7 @@ import {Fraction} from "../math/fraction";
 import {Shape, ShapeType} from "./shape";
 
 export class Point extends Shape {
-  constructor(x, y) {
+  constructor(x, y, toFraction=true) {
     super();
     this.x = new Fraction(x);
     this.y = new Fraction(y);
@@ -26,5 +26,15 @@ export class Point extends Shape {
       return this;
     else
       return null;
+  }
+
+  valueOf() {
+    return new Point(this.x.valueOf(), this.y.valueOf(), toFraction=false);
+  }
+
+  draw(viewport, context) {
+    var cp = viewport.transpoint(this).valueOf();
+    context.moveTo(cp.x, cp.y);
+    context.lineTo(cp.x, cp.y);
   }
 }
