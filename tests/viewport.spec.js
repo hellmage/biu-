@@ -70,14 +70,14 @@ describe("ViewPort", function() {
     var vp = new ViewPort(1405, 704, 0.1);
     vp.move(Direction.UP, 0.2);
     vp.move(Direction.LEFT, 0.5);
-    var x = vp.transx(new Fraction(14));
-    assert.true(x.eq(1545));
+    var x = vp.transx(new Fraction(14.22));
+    assert.equal(x, 1547);
   });
   it(".transy", function() {
     var vp = new ViewPort(1405, 704, 0.1);
     vp.move(Direction.UP, 0.2);
     vp.move(Direction.LEFT, 0.5);
     var y = vp.transy(new Fraction(21.12));
-    assert.true(y.eq(281.6));
+    assert.equal(y, 282);
   });
 });

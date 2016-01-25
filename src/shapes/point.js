@@ -29,8 +29,8 @@ export class Point extends Shape {
   }
 
   draw(viewport, context) {
-    var x = viewport.transx(this.x).valueOf();
-    var y = viewport.transx(this.y).valueOf();
+    var x = viewport.transx(this.x);
+    var y = viewport.transx(this.y);
     context.beginPath();
     context.moveTo(x, y);
     context.lineTo(x, y);

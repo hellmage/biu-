@@ -62,10 +62,10 @@ export class ViewPort {
   }
 
   transx(x) {
-    return x.sub(this.pLeftTop.x).div(this.zoomFactor);
+    return Math.round(x.sub(this.pLeftTop.x).div(this.zoomFactor).valueOf());
   }
 
   transy(y) {
-    return this.pLeftTop.y.sub(y).div(this.zoomFactor);
+    return Math.round(this.pLeftTop.y.sub(y).div(this.zoomFactor).valueOf());
   }
 }
