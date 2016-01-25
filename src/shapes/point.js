@@ -21,17 +21,19 @@ export class Point extends Shape {
   intersect(viewport) {
     if (this.x.gte(viewport.pLeftTop.x)
         && this.x.lte(viewport.pLeftTop.x.add(viewport.pWidth))
-        && this.y.gte(viewport.pLeftTop.y)
-        && this.y.lte(viewport.pLeftTop.y.add(viewport.pHeight)))
+        && this.y.lte(viewport.pLeftTop.y)
+        && this.y.gte(viewport.pLeftTop.y.sub(viewport.pHeight)))
       return this;
     else
       return null;
   }
 
   draw(viewport, context) {
-    var x = viewport.transx(cp.x).valueOf();
-    var y = viewport.transx(cp.y).valueOf();
+    var x = viewport.transx(this.x).valueOf();
+    var y = viewport.transx(this.y).valueOf();
+    context.beginPath();
     context.moveTo(x, y);
     context.lineTo(x, y);
+    context.stroke();
   }
 }

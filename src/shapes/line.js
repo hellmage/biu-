@@ -23,28 +23,34 @@ export class Line extends Shape {
 
   // @param vp: ViewPort
   _bCohenSutherland(vp) {
+    // region definition: https://en.wikipedia.org/wiki/Cohen%E2%80%93Sutherland_algorithm
+    // 1001 | 1000 | 1010
+    // -----+------+-----
+    // 0001 | 0000 | 0010
+    // -----+------+-----
+    // 0101 | 0100 | 0110
     // @param p: Point
     // @return number
     function region(p) {
-      if (p.x.lte(vp.pLeftTop.x) && p.y.lte(vp.pLeftTop.y))
+      if (p.x.lte(vp.pLeftTop.x) && p.y.gte(vp.pLeftTop.y))
         return 9; // 1001
-      else if (p.x.lte(vp.pLeftTop.x) && p.y.gt(vp.pLeftTop.y)
-               && p.y.lte(vp.pLeftTop.y.add(vp.pHeight)))
+      else if (p.x.lte(vp.pLeftTop.x)
+               && p.y.lt(vp.pLeftTop.y) && p.y.gte(vp.pLeftTop.y.sub(vp.pHeight)))
         return 1; // 0001
-      else if (p.x.lte(vp.pLeftTop.x) && p.y.gt(vp.pLeftTop.y.add(vp.pHeight)))
+      else if (p.x.lte(vp.pLeftTop.x) && p.y.lt(vp.pLeftTop.y.sub(vp.pHeight)))
         return 5; // 0101
       else if (p.x.gt(vp.pLeftTop.x) && p.x.lte(vp.pLeftTop.x.add(vp.pWidth))
-               && p.y.gte(vp.pLeftTop.y.add(vp.pHeight)))
+               && p.y.lte(vp.pLeftTop.y.sub(vp.pHeight)))
         return 4; // 0100
-      else if (p.x.gt(vp.pLeftTop.x.add(vp.pWidth)) && p.y.gte(vp.pLeftTop.y.add(vp.pHeight)))
+      else if (p.x.gt(vp.pLeftTop.x.add(vp.pWidth)) && p.y.lte(vp.pLeftTop.y.sub(vp.pHeight)))
         return 6; // 0110
-      else if (p.x.gte(vp.pLeftTop.x.add(vp.pWidth)) && p.y.gt(vp.pLeftTop.y)
-               && p.y.lte(vp.pLeftTop.y.add(vp.pHeight)))
+      else if (p.x.gte(vp.pLeftTop.x.add(vp.pWidth))
+               && p.y.lt(vp.pLeftTop.y) && p.y.gte(vp.pLeftTop.y.sub(vp.pHeight)))
         return 2; // 0010
-      else if (p.x.gte(vp.pLeftTop.x.add(vp.pWidth)) && p.y.lte(vp.pLeftTop.y))
+      else if (p.x.gte(vp.pLeftTop.x.add(vp.pWidth)) && p.y.gte(vp.pLeftTop.y))
         return 10; // 1010
       else if (p.x.gt(vp.pLeftTop.x) && p.x.lte(vp.pLeftTop.x.add(vp.pWidth))
-               && p.y.lte(vp.pLeftTop.y))
+               && p.y.gte(vp.pLeftTop.y))
         return 8; // 1000
       else
         return 0; // 0000
@@ -64,7 +70,7 @@ export class Line extends Shape {
   _clipLiangBarsky(vp) {
     var dx = this.p2.x.sub(this.p1.x), dy = this.p2.y.sub(this.p1.y);
     var xWinMin = vp.pLeftTop.x, xWinMax = vp.pLeftTop.x.add(vp.pWidth);
-    var yWinMin = vp.pLeftTop.y, yWinMax = vp.pLeftTop.y.add(vp.pHeight);
+    var yWinMin = vp.pLeftTop.y.sub(vp.pHeight), yWinMax = vp.pLeftTop.y;
     var p1 = dx.neg(), q1 = this.p1.x.sub(xWinMin),
         p2 = dx, q2 = xWinMax.sub(this.p1.x),
         p3 = dy.neg(), q3 = this.p1.y.sub(yWinMin),
@@ -80,10 +86,10 @@ export class Line extends Shape {
       t1 = q2.div(p2).max(0);
       t2 = q1.div(p1).min(1);
     }
-    if (dy > 0) {
+    if (dy.gt(0)) {
       t1 = q3.div(p3).max(t1);
       t2 = q4.div(p4).min(t2);
-    } else if (dy < 0) {
+    } else if (dy.lt(0)) {
       t1 = q4.div(p4).max(t1);
       t2 = q3.div(p3).min(t2);
     }
@@ -113,7 +119,9 @@ export class Line extends Shape {
   }
 
   draw(viewport, context) {
-    context.moveTo(viewport.transx(p1.x).valueOf(), viewport.transy(p1.y).valueOf());
-    context.lineTo(viewport.transx(p2.x).valueOf(), viewport.transy(p2.y).valueOf());
+    context.beginPath();
+    context.moveTo(viewport.transx(this.p1.x).valueOf(), viewport.transy(this.p1.y).valueOf());
+    context.lineTo(viewport.transx(this.p2.x).valueOf(), viewport.transy(this.p2.y).valueOf());
+    context.stroke();
   }
 }

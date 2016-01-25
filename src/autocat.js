@@ -1,8 +1,11 @@
+import {Point} from "./shapes/point"
+import {Line} from "./shapes/line"
+
 export class AutoCAT {
   constructor(viewport, canvas) {
     this.viewport = viewport;
     this.canvas = canvas;
-    this.shapes = [];
+    this.shapes = [new Line(new Point(-700, -400), new Point(100, 400))];
     this.visibleShapes = [];
   }
 

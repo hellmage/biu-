@@ -30,7 +30,6 @@ function commandConsumer(evt) {
   }
   if (action) {
     autocat.move(action);
-    console.log(`moving ${action}`);
   }
 }
 
