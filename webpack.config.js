@@ -11,7 +11,7 @@ module.exports = {
       }
     ]
   },
-  entry: glob.sync("./src/**/*.js").filter(function(p) { return p != './src/main.js'; }),
+  entry: './src/main.js',
   output: {
     path: path.resolve(__dirname, 'built'),
     filename: 'bundle.js'
