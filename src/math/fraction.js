@@ -1,6 +1,9 @@
 import * as _Fraction from "fraction.js"
 
 Object.assign(_Fraction.default.prototype, {
+  'eq': function(f) {
+    return this.compare(new Fraction(f)) === 0;
+  },
   'ne': function(f) {
     return this.compare(new Fraction(f)) !== 0;
   },

@@ -112,14 +112,8 @@ export class Line extends Shape {
       return this._clipLiangBarsky(vp);
   }
 
-  valueOf() {
-    return new Line(this.p1.valueOf(), this.p2.valueOf());
-  }
-
   draw(viewport, context) {
-    var p1 = viewport.transpoint(this.p1).valueOf();
-    var p2 = viewport.transpoint(this.p2).valueOf();
-    context.moveTo(p1.x, p1.y);
-    context.lineTo(p2.x, p2.y);
+    context.moveTo(viewport.transx(p1.x).valueOf(), viewport.transy(p1.y).valueOf());
+    context.lineTo(viewport.transx(p2.x).valueOf(), viewport.transy(p2.y).valueOf());
   }
 }

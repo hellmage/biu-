@@ -14,9 +14,9 @@ export var Direction = new EnumDirection();
 
 // canvas dimensions are with prefix "c"
 // plane dimensions are with prefix "p"
-// zoomFactor = (canvas pixel) / (viewport width on the plane)
-// so, zoom in  == zoomFactor > 1
-//     zoom out == zoomFactor < 1
+// zoomFactor = (plane viewport width) / (canvas pixel)
+// so, zoom out == zoomFactor > 1
+//     zoom in  == zoomFactor < 1
 export class ViewPort {
   constructor(
     cWidth,  // canvas width, in pixels
@@ -54,7 +54,7 @@ export class ViewPort {
         this.pLeftTop = new Point(this.pLeftTop.x.sub(pWidthDelta), this.pLeftTop.y);
         break;
       case Direction.RIGHT:
-        this.pLeftTop = new Point(this.pLeftTop.x.sub(pWidthDelta), this.pLeftTop.y);
+        this.pLeftTop = new Point(this.pLeftTop.x.add(pWidthDelta), this.pLeftTop.y);
         break;
       default:
         console.log("Unknown direction: " + dir);
@@ -62,16 +62,10 @@ export class ViewPort {
   }
 
   transx(x) {
-    return x.sub(this.pLeftTop.x).mul(this.zoomFactor);
+    return x.sub(this.pLeftTop.x).div(this.zoomFactor);
   }
 
   transy(y) {
-    return y.sub(this.pLeftTop.y).mul(this.zoomFactor);
-  }
-
-  // @param pPoint: Point, on the plane
-  // @return Point, on the canvas
-  transpoint(pPoint) {
-    return new Point(transx(pPoint.x), transy(pPoint.y));
+    return y.sub(this.pLeftTop.y).div(this.zoomFactor);
   }
 }

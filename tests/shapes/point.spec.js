@@ -1,9 +1,16 @@
-import {assert} from "./utils/assert"
-import {Fraction} from "../src/math/fraction"
-import {Point} from "../src/shapes/point";
-import {ViewPort} from "../src/viewport";
+import {assert} from "../utils/assert"
+import {Fraction} from "../../src/math/fraction"
+import {ShapeType} from "../../src/shapes/shape";
+import {Point} from "../../src/shapes/point";
+import {ViewPort} from "../../src/viewport";
 
 describe("Point", function() {
+  describe("constructor", function() {
+    it("set type to Point", function() {
+      var p = new Point(-12, 5);
+      assert.equal(p.type, ShapeType.Point);
+    });
+  });
   describe(".intersect", function(){
     it("returns null when the point is inside the viewport", function() {
       var p = new Point(20, 20);

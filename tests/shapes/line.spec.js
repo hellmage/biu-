@@ -1,10 +1,19 @@
-import {assert} from "./utils/assert";
-import {Fraction} from "../src/math/fraction";
-import {Point} from "../src/shapes/point";
-import {Line} from "../src/shapes/line";
-import {ViewPort} from "../src/viewport";
+import {assert} from "../utils/assert";
+import {Fraction} from "../../src/math/fraction";
+import {ShapeType} from "../../src/shapes/shape";
+import {Point} from "../../src/shapes/point";
+import {Line} from "../../src/shapes/line";
+import {ViewPort} from "../../src/viewport";
 
 describe("Line", function() {
+  describe("constructor", function() {
+    it("set type to Line", function() {
+      var p1 = new Point(-12, 5);
+      var p2 = new Point(20, -5);
+      var l = new Line(p1, p2);
+      assert.equal(l.type, ShapeType.Line);
+    });
+  });
   it(".toString", function() {
     var p1 = new Point(-12, 5);
     var p2 = new Point(20, -5);
