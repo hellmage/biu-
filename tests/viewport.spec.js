@@ -70,14 +70,28 @@ describe("ViewPort", function() {
     var vp = new ViewPort(1405, 704, 0.1);
     vp.move(Direction.UP, 0.2);
     vp.move(Direction.LEFT, 0.5);
-    var x = vp.p2cx(new Fraction(14.22));
-    assert.equal(x, 1547.2);
+    var cx = vp.p2cx(new Fraction(14.22));
+    assert.equal(cx, 1547.2);
   });
   it(".p2cy", function() {
     var vp = new ViewPort(1405, 704, 0.1);
     vp.move(Direction.UP, 0.2);
     vp.move(Direction.LEFT, 0.5);
-    var y = vp.p2cy(new Fraction(21.12));
-    assert.equal(y, 281.6);
+    var cy = vp.p2cy(new Fraction(21.12));
+    assert.equal(cy, 281.6);
+  });
+  it(".c2px", function() {
+    var vp = new ViewPort(1405, 704, 0.1);
+    vp.move(Direction.UP, 0.2);
+    vp.move(Direction.LEFT, 0.5);
+    var px = vp.c2px(992);
+    assert.equal(px, -41.3);
+  });
+  it(".c2py", function() {
+    var vp = new ViewPort(1405, 704, 0.1);
+    vp.move(Direction.UP, 0.2);
+    vp.move(Direction.LEFT, 0.5);
+    var py = vp.c2py(308);
+    assert.equal(py, 18.48);
   });
 });

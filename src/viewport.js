@@ -62,12 +62,22 @@ export class ViewPort {
   }
 
   // x coordinate: plane to canvas
-  p2cx(x) {
-    return x.sub(this.pLeftTop.x).div(this.zoomFactor).valueOf();
+  p2cx(px) {
+    return px.sub(this.pLeftTop.x).div(this.zoomFactor).valueOf();
   }
 
   // y coordinate: plane to canvas
-  p2cy(y) {
-    return this.pLeftTop.y.sub(y).div(this.zoomFactor).valueOf();
+  p2cy(py) {
+    return this.pLeftTop.y.sub(py).div(this.zoomFactor).valueOf();
+  }
+
+  // x coordinate: canvas to plane
+  c2px(cx) {
+    return this.zoomFactor.mul(cx).add(this.pLeftTop.x).valueOf();
+  }
+
+  // y coordinate: canvas to plane
+  c2py(cy) {
+    return this.pLeftTop.y.sub(this.zoomFactor.mul(cy)).valueOf();
   }
 }

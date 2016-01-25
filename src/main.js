@@ -47,7 +47,9 @@ function registerCursorEvents() {
     tip.style.display = "none";
   });
   plane.addEventListener("mousemove", function(evt) {
-    tip.innerHTML = "(" + evt.pageX + ", " + evt.pageY + ")";  // FIXME show the plane coordinate
+    var c = `(${evt.pageX},${evt.pageY})`;
+    var p = `(${autocat.viewport.c2px(evt.pageX)},${autocat.viewport.c2py(evt.pageY)})`;
+    tip.innerHTML = `c${c}, p${p}`;
     var tipWidth = tip.offsetWidth, tipHeight = tip.offsetHeight;
     var top = evt.pageY + 5, left = evt.pageX + 5;
     if (top + tipHeight + 5 > evt.target.clientHeight)
