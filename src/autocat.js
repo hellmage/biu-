@@ -5,7 +5,7 @@ export class AutoCAT {
   constructor(viewport, canvas) {
     this.viewport = viewport;
     this.canvas = canvas;
-    this.shapes = [new Line(new Point(-700, -400), new Point(100, 400))];
+    this.shapes = [new Line(new Point(-700, -300), new Point(-100, 300)), new Line(new Point(-700, -350), new Point(-100, 300)), new Line(new Point(-700, -800), new Point(-100, 350))];
     this.visibleShapes = [];
   }
 

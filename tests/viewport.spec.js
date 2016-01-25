@@ -28,7 +28,7 @@ describe("ViewPort", function() {
       assert.true(vp.cHeight.eq(704));
       assert.true(vp.pWidth.eq(421.5));
       assert.true(vp.pHeight.eq(211.2));
-      assert.true(vp.pLeftTop.equals(new Point(-210.75, 105.6)), vp.pLeftTop.toString());
+      assert.true(vp.pLeftTop.equals(new Point(-210.75, 105.6)));
     });
     it("zoom out", function() {
       var vp = new ViewPort(1405, 704);
@@ -37,7 +37,7 @@ describe("ViewPort", function() {
       assert.true(vp.cHeight.eq(704));
       assert.true(vp.pWidth.eq(7025));
       assert.true(vp.pHeight.eq(3520));
-      assert.true(vp.pLeftTop.equals(new Point(-3512.5, 1760)), vp.pLeftTop.toString());
+      assert.true(vp.pLeftTop.equals(new Point(-3512.5, 1760)));
     });
   });
   describe(".move", function() {
@@ -48,7 +48,7 @@ describe("ViewPort", function() {
       assert.true(vp.cHeight.eq(704));
       assert.true(vp.pWidth.eq(1405));
       assert.true(vp.pHeight.eq(704));
-      assert.true(vp.pLeftTop.equals(new Point(-702.5, 422.4)), vp.pLeftTop.toString());
+      assert.true(vp.pLeftTop.equals(new Point(-702.5, 422.4)));
     });
     it("down", function() {
       var vp = new ViewPort(1405, 704);

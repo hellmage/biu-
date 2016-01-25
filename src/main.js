@@ -61,23 +61,8 @@ function registerCursorEvents() {
 }
 
 function initCanvas(plane) {
-  //return an object with the dimension of the viewport of the browser
-  function getViewportDimension() {
-    var e = window, a = 'inner';
-    if (!( 'innerWidth' in window )) {
-      a = 'client';
-      e = document.documentElement || document.body;
-    }
-    return {w:e[a + 'Width'], h:e[a + 'Height']};
-  }
-
-  //apply the dimension to the canvas
-  var dim = getViewportDimension();
-  plane.style.position = "absolute";
-  plane.style.left = "5px";
-  plane.style.top = "5px";
-  plane.width = dim.w - 10;
-  plane.height = dim.h - 10;
+  plane.width = plane.offsetWidth;
+  plane.height = plane.offsetHeight;
 }
 
 function animate() {
