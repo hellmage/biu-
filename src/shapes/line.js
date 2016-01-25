@@ -120,8 +120,8 @@ export class Line extends Shape {
 
   draw(viewport, context) {
     context.beginPath();
-    context.moveTo(viewport.transx(this.p1.x), viewport.transy(this.p1.y));
-    context.lineTo(viewport.transx(this.p2.x), viewport.transy(this.p2.y));
+    context.moveTo(viewport.p2cx(this.p1.x), viewport.p2cy(this.p1.y));
+    context.lineTo(viewport.p2cx(this.p2.x), viewport.p2cy(this.p2.y));
     context.stroke();
   }
 }

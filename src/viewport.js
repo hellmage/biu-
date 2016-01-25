@@ -61,11 +61,13 @@ export class ViewPort {
     }
   }
 
-  transx(x) {
-    return Math.round(x.sub(this.pLeftTop.x).div(this.zoomFactor).valueOf());
+  // x coordinate: plane to canvas
+  p2cx(x) {
+    return x.sub(this.pLeftTop.x).div(this.zoomFactor).valueOf();
   }
 
-  transy(y) {
-    return Math.round(this.pLeftTop.y.sub(y).div(this.zoomFactor).valueOf());
+  // y coordinate: plane to canvas
+  p2cy(y) {
+    return this.pLeftTop.y.sub(y).div(this.zoomFactor).valueOf();
   }
 }

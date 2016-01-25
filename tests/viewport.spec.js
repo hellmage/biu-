@@ -66,18 +66,18 @@ describe("ViewPort", function() {
       assert.true(vp.pLeftTop.equals(new Point(-421.5, 352)));
     });
   });
-  it(".transx", function() {
+  it(".p2cx", function() {
     var vp = new ViewPort(1405, 704, 0.1);
     vp.move(Direction.UP, 0.2);
     vp.move(Direction.LEFT, 0.5);
-    var x = vp.transx(new Fraction(14.22));
-    assert.equal(x, 1547);
+    var x = vp.p2cx(new Fraction(14.22));
+    assert.equal(x, 1547.2);
   });
-  it(".transy", function() {
+  it(".p2cy", function() {
     var vp = new ViewPort(1405, 704, 0.1);
     vp.move(Direction.UP, 0.2);
     vp.move(Direction.LEFT, 0.5);
-    var y = vp.transy(new Fraction(21.12));
-    assert.equal(y, 282);
+    var y = vp.p2cy(new Fraction(21.12));
+    assert.equal(y, 281.6);
   });
 });
