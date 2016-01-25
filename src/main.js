@@ -2,29 +2,42 @@ import {AutoCAT} from "./autocat"
 import {ViewPort} from "./viewport"
 
 function commandConsumer(evt) {
-  var action = null;
+  var moveAction = null;
   switch (evt.keyCode) {
     case '37':  // left
     case 37:
-      action = "left";
+      moveAction = "left";
+      autocat.move(moveAction)
       break;
     case '39':  // right
     case 39:
-      action = "right";
+      moveAction = "right";
+      autocat.move(moveAction)
       break;
     case '38':  // up
     case 38:
-      action = "up";
+      moveAction = "up";
+      autocat.move(moveAction)
       break;
     case '40':  // down
     case 40:
-      action = "down";
+      moveAction = "down";
+      autocat.move(moveAction)
       break;
     default:
       break;
   }
-  if (action) {
-    autocat.move(action);
+  switch (evt.charCode) {
+    case '43':  // +
+    case 43:
+      autocat.zoomin();
+      break;
+    case '45':  // -
+    case 45:
+      autocat.zoomout();
+      break;
+    default:
+      break;
   }
 }
 

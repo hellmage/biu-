@@ -24,6 +24,16 @@ export class AutoCAT {
     this.updateVisibleShapes();
   }
 
+  zoomin() {
+    this.viewport.zoom(-0.1);
+    this.updateVisibleShapes();
+  }
+
+  zoomout() {
+    this.viewport.zoom(0.1);
+    this.updateVisibleShapes();
+  }
+
   draw() {
     var ctx = this.canvas.getContext("2d");
     ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);

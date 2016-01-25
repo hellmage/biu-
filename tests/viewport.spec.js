@@ -23,7 +23,7 @@ describe("ViewPort", function() {
   describe(".zoom", function() {
     it("zoom in", function() {
       var vp = new ViewPort(1405, 704);
-      vp.zoom(0.3);
+      vp.zoom(-0.7);
       assert.true(vp.cWidth.eq(1405));
       assert.true(vp.cHeight.eq(704));
       assert.true(vp.pWidth.eq(421.5));
@@ -32,7 +32,7 @@ describe("ViewPort", function() {
     });
     it("zoom out", function() {
       var vp = new ViewPort(1405, 704);
-      vp.zoom(5);
+      vp.zoom(4);
       assert.true(vp.cWidth.eq(1405));
       assert.true(vp.cHeight.eq(704));
       assert.true(vp.pWidth.eq(7025));

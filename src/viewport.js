@@ -31,10 +31,10 @@ export class ViewPort {
     this.pLeftTop = new Point(this.pWidth.neg().div(2), this.pHeight.div(2));
   }
 
-  zoom(newZoomFactor) {
+  zoom(delta) {
     var centerx = this.pLeftTop.x.add(this.pWidth.div(2));
     var centery = this.pLeftTop.y.sub(this.pHeight.div(2));
-    this.zoomFactor = newZoomFactor;
+    this.zoomFactor = this.zoomFactor.add(delta);
     this.pWidth = this.cWidth.mul(this.zoomFactor);
     this.pHeight = this.cHeight.mul(this.zoomFactor);
     this.pLeftTop.x = centerx.sub(this.pWidth.div(2));
