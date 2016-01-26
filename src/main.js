@@ -39,10 +39,16 @@ function commandConsumer(evt) {
     default:
       break;
   }
+  switch (String.fromCharCode(evt.which)) {
+    case 'l':
+      break;
+    default:
+
+  }
 }
 
 function registerKeyboardEvents(viewport) {
-  document.addEventListener("keypress", function(evt) {
+  document.getElementById("plane").addEventListener("keypress", function(evt) {
     var message = "keypressed: " + evt.which + ', ' + String.fromCharCode(evt.which) + ', ' + evt.metaKey + ', ' + evt.keyCode + ', ' + evt.charCode;
     console.log(message);
     commandConsumer(evt);

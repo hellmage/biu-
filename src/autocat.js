@@ -7,6 +7,7 @@ export class AutoCAT {
     this.canvas = canvas;
     this.shapes = [new Line(new Point(-700, -300), new Point(-100, 300)), new Line(new Point(-700, -350), new Point(-100, 300)), new Line(new Point(-700, -800), new Point(-100, 350))];
     this.visibleShapes = [];
+    this.drawingShape = null;
   }
 
   updateVisibleShapes() {
