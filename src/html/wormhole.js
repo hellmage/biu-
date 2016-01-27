@@ -3,13 +3,12 @@ export const Channels = {  // Enum
 }
 
 export function emit(channel, message) {
-  console.log(`wormhole emit: ${channel}, ${message}`);
   var event = null;
   if (window.CustomEvent) {
-    event = new CustomEvent(channel, {detail: {message: message}});
+    event = new CustomEvent(channel, {detail: message});
   } else {
     event = document.createEvent('CustomEvent');
-    event.initCustomEvent(channel, true, true, {message: message});
+    event.initCustomEvent(channel, true, true, message);
   }
   var wormhole = document.getElementById("wormhole");
   wormhole.dispatchEvent(event);

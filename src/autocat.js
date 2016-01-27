@@ -50,6 +50,9 @@ export class AutoCAT {
   }
 
   receive(evt) {
-    log.info(`autocat module: receiving message: ${evt}`);
+    var data = evt;
+    if ('detail' in evt)
+      data = evt.detail;
+    log.info("[autocat]" + data);
   }
 }

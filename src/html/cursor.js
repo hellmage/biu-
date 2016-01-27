@@ -1,3 +1,4 @@
+import * as WormHole from "./wormhole"
 
 export function init() {
   var tip = document.getElementById("coord-tip");
@@ -25,6 +26,12 @@ export function init() {
     tip.style.left = `${left}px`;
     tip.style.top = `${top}px`;
   });
+  plane.addEventListener("click", function(evt) {
+    WormHole.emit(
+      WormHole.Channels.AUTOCAT,
+      `(${autocat.viewport.c2px(evt.pageX)},${autocat.viewport.c2py(evt.pageY)})`
+    );
+  })
 }
 
 const Radius = 40;  // pixels on canvas
