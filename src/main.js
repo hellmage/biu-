@@ -1,5 +1,6 @@
 import {AutoCAT} from "./autocat"
 import {ViewPort} from "./viewport"
+import * as RightPanel from "./html/right-panel"
 
 function commandConsumer(evt) {
   var moveAction = null;
@@ -48,7 +49,7 @@ function commandConsumer(evt) {
 }
 
 function registerKeyboardEvents(viewport) {
-  document.getElementById("plane").addEventListener("keypress", function(evt) {
+  document.addEventListener("keypress", function(evt) {
     var message = "keypressed: " + evt.which + ', ' + String.fromCharCode(evt.which) + ', ' + evt.metaKey + ', ' + evt.keyCode + ', ' + evt.charCode;
     console.log(message);
     commandConsumer(evt);
@@ -105,6 +106,7 @@ function ready() {
   var viewport = new ViewPort(plane.offsetWidth, plane.offsetHeight);
   window.autocat = new AutoCAT(viewport, plane);
   initCanvas(plane);
+  RightPanel.init();
   registerKeyboardEvents();
   registerCursorEvents();
   initAnimation();

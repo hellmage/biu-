@@ -1,16 +1,12 @@
 import {Fraction} from "./math/fraction"
 import {Point} from "./shapes/point"
 
-class EnumDirection {
-  constructor() {
-    this.UP = "up";
-    this.DOWN = "down";
-    this.LEFT = "left";
-    this.RIGHT = "right";
-  }
-}
-
-export var Direction = new EnumDirection();
+export const Direction = {
+  UP: "up",
+  DOWN: "down",
+  LEFT: "left",
+  RIGHT: "right"
+};
 
 // canvas dimensions are with prefix "c"
 // plane dimensions are with prefix "p"

@@ -36,15 +36,10 @@ export class Shape {
   }
 }
 
-// enum
-class EnumShapeType {
-  constructor() {
-    this.Point = "point";
-    this.Line = "line";
-    this.MultiLine = "multiline";
-    this.Rectangle = "rectangle";
-    this.Circle = "circle";
-  }
-}
-
-export var ShapeType = new EnumShapeType();
+export const ShapeType = {  // Enum
+  Point: "point",
+  Line: "line",
+  MultiLine: "multiline",
+  Rectangle: "rectangle",
+  Circle: "circle"
+};

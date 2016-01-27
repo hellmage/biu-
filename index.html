@@ -32,19 +32,17 @@
     display: flex;
     flex-direction: column;
     justify-content: space-between;
+    background-color: rgb(245,245,245);
   }
-  #messages {
-    order: 1;
+  #right-panel > * {
+    margin-top: 3px;
     margin-bottom: 3px;
   }
-  #right-panel-foot {
-    order: 2;
-    margin-top: 3px;
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
+  #hide-panel {
+    order: 3;
   }
-  #messages {
+  #logs {
+    order: 2;
     outline: none;
     resize: none;
     overflow: auto;
@@ -52,6 +50,17 @@
     height: 100%;
     /* http://stackoverflow.com/questions/271067/how-can-i-make-a-textarea-100-width-without-overflowing-when-padding-is-present */
     box-sizing: border-box;
+  }
+  #logs > p {
+    margin: 1px;
+    font-family: monospace;
+    font-size: 0.8em;
+  }
+  #right-panel-foot {
+    order: 1;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
   }
   #user-input {
     order: 1;
@@ -68,11 +77,12 @@
   <pre id="coord-tip" style="display:none"></pre>
   <canvas id="plane"></canvas>
   <div id="right-panel">
-    <input type="textarea" disabled="true" id="messages" />
+    <div id="logs"></div>
     <div id="right-panel-foot">
       <input type="text" id="user-input" />
-      <input type="submit" id="submit" value="Enter" />
+      <button id="submit">Enter</button>
     </div>
+    <button id="hide-panel">Hide -></button>
   </div>
 </body>
 </html>
