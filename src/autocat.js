@@ -1,4 +1,5 @@
 import * as log from "./html/logging"
+import * as Cursor from "./html/cursor"
 import {Point} from "./shapes/point"
 import {Line} from "./shapes/line"
 
@@ -9,6 +10,8 @@ export class AutoCAT {
     this.shapes = [new Line(new Point(-700, -300), new Point(-100, 300)), new Line(new Point(-700, -350), new Point(-100, 300)), new Line(new Point(-700, -800), new Point(-100, 350))];
     this.visibleShapes = [];
     this.drawingShape = null;
+    this.cx = null;   // cursor x on canvas
+    this.cy = null;   // cursor y on canvas
   }
 
   updateVisibleShapes() {
@@ -43,6 +46,7 @@ export class AutoCAT {
       var shape = this.visibleShapes[i];
       shape.draw(this.viewport, ctx);
     }
+    Cursor.draw(ctx, this.cx, this.cy);
   }
 
   receive(evt) {

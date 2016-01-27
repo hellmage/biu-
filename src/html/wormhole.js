@@ -1,4 +1,4 @@
-export const Channels = {
+export const Channels = {  // Enum
   AUTOCAT: "autocat"
 }
 
