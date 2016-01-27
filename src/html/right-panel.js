@@ -12,4 +12,14 @@ export function init() {
     if (evt.which === 13)
       input();
   })
+
+  document.getElementById("right-panel-anchor").addEventListener("click", function(evt) {
+    document.getElementById("right-panel-anchor").style.display = "none";
+    document.getElementById("right-panel").style.display = "";
+  })
+
+  document.getElementById("hide-panel").addEventListener("click", function(evt) {
+    document.getElementById("right-panel").style.display = "none";
+    document.getElementById("right-panel-anchor").style.display = "block";
+  })
 }
