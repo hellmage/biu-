@@ -1,3 +1,4 @@
+import * as log from "./html/logging"
 import {Point} from "./shapes/point"
 import {Line} from "./shapes/line"
 
@@ -42,5 +43,9 @@ export class AutoCAT {
       var shape = this.visibleShapes[i];
       shape.draw(this.viewport, ctx);
     }
+  }
+
+  receive(evt) {
+    log.info(`autocat module: receiving message: ${evt}`);
   }
 }
