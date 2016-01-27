@@ -53,4 +53,19 @@ describe("Point", function() {
     var p = new Point(2, 3);
     assert.equal(p.toString(), "(2,3)")
   });
+  describe(".fromString", function() {
+    it("happy path", function() {
+      assert.true(Point.fromString("(2,3)").equals(new Point(2, 3)));
+      assert.true(Point.fromString("(2, 3)").equals(new Point(2, 3)));
+      assert.true(Point.fromString("(2,  3)").equals(new Point(2, 3)));
+      assert.true(Point.fromString("(2.1, 3)").equals(new Point(2.1, 3)));
+    });
+    it("bad inputs", function() {
+      assert.isNull(Point.fromString("(a,3)"));
+      assert.isNull(Point.fromString("xxxx"));
+      assert.isNull(Point.fromString("(,0)"));
+      assert.isNull(Point.fromString("(0,)"));
+      assert.isNull(Point.fromString("(0,3,4)"));
+    });
+  });
 });

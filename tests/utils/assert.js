@@ -6,5 +6,8 @@ export var assert = Object.assign(_assert, {
   },
   'false': function(predicate, message="") {
     return _assert.equal(predicate, false, message);
+  },
+  'isNull': function(predicate, message="") {
+    return _assert.equal(predicate, null, message);
   }
 });
