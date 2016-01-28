@@ -31,8 +31,6 @@ export function debug(message) {
 function log(level, message) {
   var container = document.getElementById("logs");
   if (container.children.length >= LogCountMax)
-    container.removeChild(container.childNodes[container.children.length - 1]);
-  container.innerHTML =
-    `<p>[<span style='font-color:black'>${level.toUpperCase()}</span>]${message}</p>`
-    + container.innerHTML;
+    container.removeChild(container.childNodes[0]);
+  container.innerHTML += `<p>[<span style='font-color:black'>${level.toUpperCase()}</span>]${message}</p>`;
 }

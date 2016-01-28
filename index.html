@@ -39,7 +39,7 @@
     margin-bottom: 3px;
   }
   #hide-panel {
-    order: 3;
+    order: 1;
   }
   #logs {
     order: 2;
@@ -50,6 +50,9 @@
     height: 100%;
     /* http://stackoverflow.com/questions/271067/how-can-i-make-a-textarea-100-width-without-overflowing-when-padding-is-present */
     box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
   }
   #logs > p {
     margin: 1px;
@@ -57,7 +60,7 @@
     font-size: 0.8em;
   }
   #right-panel-foot {
-    order: 1;
+    order: 3;
     display: flex;
     flex-direction: row;
     justify-content: space-between;
@@ -73,8 +76,8 @@
   }
   #right-panel-anchor {
     position: absolute;
+    top: 20px;
     right: 0px;
-    bottom: 20px;
     padding: 10px;
     margin: 10px;
     font-weight: bold;
