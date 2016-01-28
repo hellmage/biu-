@@ -11,8 +11,6 @@ export function init() {
     tip.style.display = "none";
   });
   plane.addEventListener("mousemove", function(evt) {
-    autocat.cx = evt.pageX;
-    autocat.cy = evt.pageY;
     var c = `(${evt.pageX},${evt.pageY})`;
     var p = `(${autocat.viewport.c2px(evt.pageX)},${autocat.viewport.c2py(evt.pageY)})`;
     tip.innerHTML = `c${c}, p${p}`;
@@ -25,6 +23,7 @@ export function init() {
     tip.style.position = "fixed";
     tip.style.left = `${left}px`;
     tip.style.top = `${top}px`;
+    autocat.viewport.cursor(evt.pageX, evt.pageY);
   });
   plane.addEventListener("click", function(evt) {
     WormHole.emit(
@@ -36,7 +35,8 @@ export function init() {
 
 const Radius = 40;  // pixels on canvas
 
-export function draw(context, cx, cy) {
+export function draw(context, viewport) {
+  var cx = viewport.cursorX, cy = viewport.cursorY;
   if (!cx || !cy)
     return;
   context.beginPath();

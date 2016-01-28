@@ -1,5 +1,6 @@
 import {Fraction} from "./math/fraction"
 import {Point} from "./shapes/point"
+import {Plane} from "./plane"
 
 export const Direction = {
   UP: "up",
@@ -25,6 +26,13 @@ export class ViewPort {
     this.pWidth = this.cWidth.mul(this.zoomFactor);
     this.pHeight = this.cHeight.mul(this.zoomFactor);
     this.pLeftTop = new Point(this.pWidth.neg().div(2), this.pHeight.div(2));
+    this.cursorX = null;  // canvas x
+    this.cursorY = null;  // canvas y
+  }
+
+  cursor(x, y) {
+    this.cursorX = x;
+    this.cursorY = y;
   }
 
   zoom(delta) {

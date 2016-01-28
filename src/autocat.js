@@ -4,49 +4,40 @@ import {Point} from "./shapes/point"
 import {Line} from "./shapes/line"
 
 export class AutoCAT {
-  constructor(viewport, canvas) {
+  constructor(plane, viewport, canvas) {
+    this.plane = plane;
     this.viewport = viewport;
     this.canvas = canvas;
-    this.shapes = [new Line(new Point(-700, -300), new Point(-100, 300)), new Line(new Point(-700, -350), new Point(-100, 300)), new Line(new Point(-700, -800), new Point(-100, 350))];
-    this.visibleShapes = [];
-    this.drawingShape = null;
-    this.cx = null;   // cursor x on canvas
-    this.cy = null;   // cursor y on canvas
-  }
-
-  updateVisibleShapes() {
-    this.visibleShapes = [];
-    for (var i in this.shapes) {
-      var shape = this.shapes[i].intersect(this.viewport);
-      if (shape !== null)
-        this.visibleShapes.push(shape);
-    }
   }
 
   // @param dir: Direction
   move(dir) {
     this.viewport.move(dir);
-    this.updateVisibleShapes();
+    this.plane.updateVisibleShapes(this.viewport);
   }
 
   zoomin() {
     this.viewport.zoom(-0.1);
-    this.updateVisibleShapes();
+    this.plane.updateVisibleShapes(this.viewport);
   }
 
   zoomout() {
     this.viewport.zoom(0.1);
-    this.updateVisibleShapes();
+    this.plane.updateVisibleShapes(this.viewport);
+  }
+
+  updateVisibleShapes() {
+    this.plane.updateVisibleShapes(this.viewport);
   }
 
   draw() {
     var ctx = this.canvas.getContext("2d");
     ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-    for (var i in this.visibleShapes) {
-      var shape = this.visibleShapes[i];
+    for (var i in this.plane.visibleShapes) {
+      var shape = this.plane.visibleShapes[i];
       shape.draw(this.viewport, ctx);
     }
-    Cursor.draw(ctx, this.cx, this.cy);
+    Cursor.draw(ctx, this.viewport);
   }
 
   receive(evt) {
