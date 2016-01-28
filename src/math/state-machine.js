@@ -27,6 +27,8 @@ export class StateMachine {
       throw "Event must be string: " + evt;
     if (this.states.indexOf(from) === -1 || this.states.indexOf(to) === -1)
       throw `Unknown state: ${from}, ${to}`;
+    if (this.transitions[this._key(evt, from)] !== undefined)
+      throw `Redefinition of event "${evt}" on state "${from}"`;
     this.transitions[this._key(evt, from)] = to;
     return this;
   }
@@ -35,6 +37,7 @@ export class StateMachine {
     if (!this.states.initial || !this.states.ending)
       throw "Missing initial or ending state definition";
     this._state = this.states.initial;
+    return this;
   }
 
   next(evt) {

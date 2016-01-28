@@ -39,16 +39,27 @@ describe("StateMachine", function() {
         var sm = new StateMachine()
           .state('a')
           .state('b', {ending: true})
-          .event('run', 'a', 'b');
-        sm.begin();
+          .event('run', 'a', 'b')
+          .begin();
       }, /initial or ending/);
       assert.throws(function() {
         var sm = new StateMachine()
           .state('a', {initial: true})
           .state('b')
-          .event('run', 'a', 'b');
-        sm.begin();
+          .event('run', 'a', 'b')
+          .begin();
       }, /initial or ending/);
+    });
+    it("duplicate definition of event on the same state is not allowed", function() {
+      assert.throws(function() {
+        var sm = new StateMachine()
+          .state('a', {initial: true})
+          .state('b')
+          .state('c', {ending: true})
+          .event('run', 'a', 'b')
+          .event('run', 'a', 'c')
+          .begin();
+      }, /Redefinition/);
     });
   });
   describe(".next", function() {
@@ -65,8 +76,8 @@ describe("StateMachine", function() {
       var sm = new StateMachine()
         .state('a', {initial: true})
         .state('b', {ending: true})
-        .event('run', 'a', 'b');
-      sm.begin();
+        .event('run', 'a', 'b')
+        .begin();
       assert.false(sm.next('rush'));
     });
   })
