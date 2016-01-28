@@ -27,8 +27,13 @@ export function init() {
   });
   plane.addEventListener("click", function(evt) {
     WormHole.emit(
-      WormHole.Channels.AUTOCAT,
-      `(${autocat.viewport.c2px(evt.pageX)},${autocat.viewport.c2py(evt.pageY)})`
+      WormHole.Channels.AUTOCAT, {
+        type: WormHole.UserInputType.M,
+        data: {
+          cx: evt.pageX,
+          cy: evt.pageY
+        }
+      }
     );
   })
 }

@@ -1,4 +1,4 @@
-import * as wormhole from "./wormhole"
+import * as WormHole from "./wormhole"
 
 function commandConsumer(evt) {
   var moveAction = null;
@@ -51,7 +51,13 @@ export function init() {
     var message = "keypressed : " + evt.which + ', ' + String.fromCharCode(evt.which) + ', ' + evt.metaKey + ', ' + evt.keyCode + ', ' + evt.charCode;
     console.log(message);
     if (evt.target.id !== 'user-input')
-      wormhole.emit(wormhole.Channels.AUTOCAT, String.fromCharCode(evt.which));
+      WormHole.emit(WormHole.Channels.AUTOCAT, {
+        type: WormHole.UserInputType.G,
+        data: {
+          code: String.fromCharCode(evt.which),
+          meta: ''
+        }
+      });
     commandConsumer(evt);
   });
 }

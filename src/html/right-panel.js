@@ -1,9 +1,14 @@
 import * as log from "./logging"
-import * as wormhole from "./wormhole"
+import * as WormHole from "./wormhole"
 
 function emit() {
   log.info(document.getElementById("user-input").value);
-  wormhole.emit(wormhole.Channels.AUTOCAT, document.getElementById("user-input").value);
+  WormHole.emit(WormHole.Channels.AUTOCAT, {
+    type: WormHole.UserInputType.T,
+    data: {
+      s: document.getElementById("user-input").value
+    }
+  });
   document.getElementById("user-input").value = "";
 }
 

@@ -44,6 +44,6 @@ export class AutoCAT {
     var data = evt;
     if ('detail' in evt)
       data = evt.detail;
-    log.info("[autocat]" + data);
+    log.info(`[${data.type}]${data.data}`);
   }
 }
