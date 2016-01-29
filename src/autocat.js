@@ -41,9 +41,9 @@ export class AutoCAT {
   }
 
   receive(evt) {
-    var data = evt;
+    var message = evt;
     if ('detail' in evt)
-      data = evt.detail;
-    log.info(`[${data.type}]${data.data}`);
+      message = evt.detail;
+    log.info(`[${message.type}]${message.data}`);
   }
 }

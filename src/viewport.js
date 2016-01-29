@@ -30,9 +30,13 @@ export class ViewPort {
     this.cursorY = null;  // canvas y
   }
 
-  cursor(x, y) {
+  setCursor(x, y) {
     this.cursorX = x;
     this.cursorY = y;
+  }
+
+  cursor() {
+    return new Point(this.c2px(this.cursorX), this.c2py(this.cursorY));
   }
 
   zoom(delta) {
@@ -65,23 +69,23 @@ export class ViewPort {
     }
   }
 
-  // x coordinate: plane to canvas
+  // @return {number} x coordinate: plane to canvas
   p2cx(px) {
     return px.sub(this.pLeftTop.x).div(this.zoomFactor).valueOf();
   }
 
-  // y coordinate: plane to canvas
+  // @return {number} y coordinate: plane to canvas
   p2cy(py) {
     return this.pLeftTop.y.sub(py).div(this.zoomFactor).valueOf();
   }
 
-  // x coordinate: canvas to plane
+  // @return {Fraction} x coordinate: canvas to plane
   c2px(cx) {
-    return this.zoomFactor.mul(cx).add(this.pLeftTop.x).valueOf();
+    return this.zoomFactor.mul(cx).add(this.pLeftTop.x);
   }
 
-  // y coordinate: canvas to plane
+  // @return {Fraction} y coordinate: canvas to plane
   c2py(cy) {
-    return this.pLeftTop.y.sub(this.zoomFactor.mul(cy)).valueOf();
+    return this.pLeftTop.y.sub(this.zoomFactor.mul(cy));
   }
 }

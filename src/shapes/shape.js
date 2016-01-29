@@ -36,6 +36,36 @@ export class Shape {
   }
 }
 
+export class PartialShape {
+  feedPoint() {
+    throw "NotImplemented";
+  }
+  feedCommand() {
+    throw "NotImplemented";
+  }
+  feedText() {
+    throw "NotImplemented";
+  }
+  feed(message) {
+    switch (message.type) {
+      case UserInputType.M:
+        this.feedPoint(message.data);
+        break;
+      case UserInputType.G:
+        this.feedCommand(message.data);
+        break;
+      case UserInputType.T:
+        this.feedText(message.data);
+        break;
+      default:
+        throw `Unknown data type: ${data.type}`
+    }
+  }
+  draw() {
+    throw "NotImplemented";
+  }
+}
+
 export const ShapeType = {  // Enum
   Point: "point",
   Line: "line",

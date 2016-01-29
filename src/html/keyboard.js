@@ -54,7 +54,7 @@ export function init() {
       WormHole.emit(WormHole.Channels.AUTOCAT, {
         type: WormHole.UserInputType.G,
         data: {
-          code: String.fromCharCode(evt.which),
+          code: evt.which,
           meta: ''
         }
       });

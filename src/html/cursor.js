@@ -1,4 +1,5 @@
 import * as WormHole from "./wormhole"
+import {Point} from "../shapes/point"
 
 export function init() {
   var tip = document.getElementById("coord-tip");
@@ -12,7 +13,7 @@ export function init() {
   });
   plane.addEventListener("mousemove", function(evt) {
     var c = `(${evt.pageX},${evt.pageY})`;
-    var p = `(${autocat.viewport.c2px(evt.pageX)},${autocat.viewport.c2py(evt.pageY)})`;
+    var p = `(${autocat.viewport.c2px(evt.pageX).valueOf()},${autocat.viewport.c2py(evt.pageY).valueOf()})`;
     tip.innerHTML = `c${c}, p${p}`;
     var tipWidth = tip.offsetWidth, tipHeight = tip.offsetHeight;
     var top = evt.pageY + 5, left = evt.pageX + 5;
@@ -23,7 +24,7 @@ export function init() {
     tip.style.position = "fixed";
     tip.style.left = `${left}px`;
     tip.style.top = `${top}px`;
-    autocat.viewport.cursor(evt.pageX, evt.pageY);
+    autocat.viewport.setCursor(evt.pageX, evt.pageY);
   });
   plane.addEventListener("click", function(evt) {
     WormHole.emit(
@@ -31,7 +32,8 @@ export function init() {
         type: WormHole.UserInputType.M,
         data: {
           cx: evt.pageX,
-          cy: evt.pageY
+          cy: evt.pageY,
+          p: new Point(autocat.viewport.c2px(evt.pageX), autocat.viewport.c2py(evt.pageY))
         }
       }
     );

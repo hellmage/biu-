@@ -1,6 +1,118 @@
+import {StateMachine} from "../math/state-machine"
 import {Fraction} from "../math/fraction"
 import {Shape, ShapeType} from "./shape"
 import {Point} from "./point"
+
+export class PartialLine {
+  constructor() {
+    this.p1 = null;
+    this.p2 = null;
+    this.length = null;
+    this.angle = null;
+    this.ctrl = null;
+    this.type = ShapeType.Line;
+    this.machine = new StateMachine()
+      .state("start", {initial: true})
+      .state("p1")
+      .state("length")
+      .state("angle")
+      .state("p2", {ending: true})
+      .event("point", "start", "p1")
+      // length
+      .event("l", "p1", "length")
+      .event("point", "length", "p2")
+      .event("a", "length", "p2")
+      // angle
+      .event("a", "p1", "angle")
+      .event("point", "angle", "p2")
+      .event("l", "angle", "p2")
+      .begin();
+  }
+
+  feedPoint(data) {
+    var ret = this.machine.next("point");
+    if (!ret)
+      return this;
+    if (this.machine.current() === "p1")
+      this.p1 = data.p;
+    else
+      this.p2 = data.p;
+    return new Point(this.p1, this.p2);
+  }
+
+  feedCommand(data) {
+    // TODO support ctrl
+    return this;
+  }
+
+  feedText(data) {
+    var str = data.s.split(' ').filter(function(s) { return s != ''; });
+    var cmd = str[0], arg = str[1];
+    var ret = this.machine.next(cmd);
+    if (ret) {
+      switch (cmd) {
+        case 'l':
+          this.length = new Fraction(arg);
+          break;
+        case 'a':
+          this.angle = (new Fraction(arg)).mod(360).div(360).mul(2).mul(Math.PI).valueOf();
+          break;
+        default:
+          throw `Should not reach here: ${cmd}`
+      }
+      if (this.machine.finished()) {
+        var x = this.p1.x.add(this.length.mul(Math.cos(this.angle)));
+        var y = this.p1.y.add(this.length.mul(Math.sin(this.angle)));
+        return new Line(this.p1, new Point(x, y))
+      }
+    }
+    return this;
+  }
+
+  draw(viewport, context) {
+    context.beginPath();
+    context.moveTo(viewport.p2cx(this.p1.x), viewport.p2cy(this.p1.y));
+    switch (this.machine.current()) {
+      case "p1":
+        context.lineTo(viewport.cursorX, viewport.cursorY);
+        break;
+      case "length":
+        var cursorX = viewport.c2px(viewport.cursorX),
+            cursorY = viewport.c2py(viewport.cursorY);
+        var dx = cursorX.sub(this.p1.x), dy = cursorY.sub(this.p1.y);
+        if (dx.eq(0)) {
+          var length = dy.gt(0) ? this.length : -this.length;
+          context.lineTo(viewport.p2cx(this.p1.x), viewport.p2cy(this.p1.y.add(length)));
+        }
+        else {
+          var dist = Math.sqrt(dx.mul(dx).pow(2).add(dy.mul(dy).pow(2)).valueOf());
+          var destX = this.p1.x.add(dx.div(dist).mul(this.length)),
+              destY = this.p1.y.add(dy.div(dist).mul(this.length));
+          context.lineTo(viewport.p2cx(destX), viewport.p2cy(destY));
+        }
+        break;
+      case "angle":
+        var cursorX = viewport.c2px(viewport.cursorX),
+            cursorY = viewport.c2py(viewport.cursorY);
+        var dx = cursorX.sub(this.p1.x), dy = cursorY.sub(this.p1.y);
+        if (dx.eq(0)) {
+          context.lineTo(viewport.p2cx(this.p1.x), viewport.p2cy(this.p1.y.add(dy)));
+        } else {
+          if (dx.abs().gt(dy.abs)) {
+            var dy = dx.mul(Math.tan(this.angle));
+          } else {
+            var dx = dy.div(Math.tan(this.angle));
+          }
+          context.lineTo(viewport.p2cx(this.p1.x.add(dx)), viewport.p2cy(this.p1.x.add(dy)));
+        }
+        break;
+      case "p2":
+        context.moveTo(viewport.p2cx(this.p1.x), viewport.p2cy(this.p1.y));
+        context.lineTo(viewport.p2cx(this.p2.x), viewport.p2cy(this.p2.y));
+    }
+    context.stroke();
+  }
+}
 
 export class Line extends Shape {
   // @param p1: Point
