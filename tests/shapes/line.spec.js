@@ -1,8 +1,10 @@
+import proxyquire from "proxyquire"
+import sinon from "sinon"
 import {assert} from "../utils/assert";
 import {Fraction} from "../../src/math/fraction";
 import {ShapeType} from "../../src/shapes/shape";
 import {Point} from "../../src/shapes/point";
-import {Line} from "../../src/shapes/line";
+import {Line, EmptyLine, OnePointLine, FixLengthLine, FixAngleLine} from "../../src/shapes/line";
 import {ViewPort} from "../../src/viewport";
 
 describe("Line", function() {
@@ -125,6 +127,94 @@ describe("Line", function() {
       assert.throws(function() {
         l1.equals({type:'unknown'})
       }, /mismatch/);
+    });
+  });
+});
+
+describe("EmptyLine", function() {
+  describe(".feedPoint", function() {
+    it("returns an instance of OnePointLine", function() {
+      var l = new EmptyLine();
+      var next = l.feedPoint({p: new Point(0, 0)});
+      assert.true(next instanceof OnePointLine);
+      assert.true(next.p.equals(new Point(0, 0)));
+    });
+  })
+  describe(".feedCommand", function() {
+    it("returns itself", function() {
+      var l = new EmptyLine();
+      var next = l.feedCommand({code: 123});
+      assert.true(next instanceof EmptyLine);
+    });
+  });
+  describe(".feedText", function() {
+    it("returns itself", function() {
+      var l = new EmptyLine();
+      var next = l.feedText({s: 'foobar'});
+      assert.true(next instanceof EmptyLine);
+    });
+  });
+});
+
+describe("OnePointLine", function() {
+  describe(".feedPoint", function() {
+    it("returns an instance of Line", function() {
+      var l = new OnePointLine(new Point(0, 0));
+      var next = l.feedPoint({p: new Point(1, 1)});
+      assert.equal(next.type, ShapeType.Line);
+      assert.true(next.p1.equals(new Point(0, 0)));
+      assert.true(next.p2.equals(new Point(1, 1)));
+    });
+  })
+  describe(".feedCommand", function() {
+    it("returns itself", function() {
+      var l = new OnePointLine(new Point(0, 0));
+      var next = l.feedCommand({code: 123});
+      assert.true(next instanceof OnePointLine);
+    });
+  });
+  describe(".feedText", function() {
+    var lineStub = {
+      warn: function(message) {
+        // pass
+      },
+      error: function(message) {
+        // pass
+      }
+    }
+    var line = proxyquire('../../src/shapes/line', {
+      '../html/logging': lineStub
+    })
+
+    it("returns FixLengthLine for 'l' subcommand", function() {
+      var l = new OnePointLine(new Point(0, 0));
+      var next = l.feedText({s: 'l 10'});
+      assert.true(next instanceof FixLengthLine);
+      assert.true(next.p.equals(new Point(0, 0)));
+      assert.equal(next.length, 10);
+    });
+    it("returns FixLengthLine for 'a' subcommand", function() {
+      var l = new OnePointLine(new Point(0, 0));
+      var next = l.feedText({s: 'a 30'});
+      assert.true(next instanceof FixAngleLine);
+      assert.true(next.p.equals(new Point(0, 0)));
+      assert.equal(next.angle.toPrecision(2), '0.52');
+    });
+    it("returns itself for invalid argument", function() {
+      var errorspy = sinon.spy();
+      lineStub.error = errorspy;
+      var l = new line.OnePointLine(new Point(0, 0));
+      var next = l.feedText({s: 'a 30degrees'});
+      assert.true(next instanceof line.OnePointLine);
+      assert.true(errorspy.calledWith("Invalid argument: a 30degrees"));
+    });
+    it("returns itself for unknown subcommand", function() {
+      var errorspy = sinon.spy();
+      lineStub.error = errorspy;
+      var l = new line.OnePointLine(new Point(0, 0));
+      var next = l.feedText({s: 'cmd 123'});
+      assert.true(next instanceof line.OnePointLine);
+      assert.true(errorspy.calledWith("Unrecognized subcommand: cmd"));
     });
   });
 });

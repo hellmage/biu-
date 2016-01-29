@@ -1,15 +1,16 @@
-import * as log from "../html/logging"
-import {Fraction} from "../math/fraction"
-import {PartialShape, Shape, ShapeType} from "./shape"
-import {Point} from "./point"
+import * as log from "../html/logging";
+import {Fraction} from "../math/fraction";
+import {PartialShape, Shape, ShapeType} from "./shape";
+import {Point} from "./point";
 
 function extractCmdArg(input) {
   var str = input.split(' ').filter(s => s != '');
-  var cmd = str[0], arg = str.pop().join(' ');
+  var cmd = str.shift(), arg = str.join(' ');
   try {
     arg = new Fraction(arg);
     return [cmd, arg];
   } catch(e) {
+    log.error(`Invalid argument: ${input}`);
     return [cmd, null]
   }
 }
@@ -48,19 +49,18 @@ export class OnePointLine extends PartialShape {
   feedText(message) {
     var [cmd, arg] = extractCmdArg(message.s)
     if (arg === null) {
-      log.warn(`Invalid argument: ${arg}`);
       return this;
     }
     var next = this;
     switch (cmd) {
-      case 'l':
+      case 'l': // here length refers to distance on the plane
         next = new FixLengthLine(this.p, arg);
         break;
       case 'a':
         next = new FixAngleLine(this.p, convertAngle(arg));
         break;
       default:
-        log.warn(`Unrecognized indicator: ${cmd}`);
+        log.error(`Unrecognized subcommand: ${cmd}`);
         break;
     }
     return next;
@@ -103,7 +103,6 @@ export class FixLengthLine extends PartialShape {
   feedText(message) {
     var [cmd, arg] = extractCmdArg(message.s)
     if (arg === null) {
-      log.warn(`Invalid argument: ${arg}`);
       return this;
     }
     var next = this;
@@ -113,7 +112,7 @@ export class FixLengthLine extends PartialShape {
           destY = this.p.y.add(this.length.mul(Math.sin(angle)));
       next = new Point(this.p, new Point(destX, destY));
     } else {
-      log.warn(`Unrecognized indicator: ${cmd}`);
+      log.error(`Unrecognized indicator: ${cmd}`);
     }
     return next;
   }
@@ -155,7 +154,6 @@ export class FixAngleLine extends PartialShape {
   feedText(message) {
     var [cmd, arg] = extractCmdArg(message.s)
     if (arg === null) {
-      log.warn(`Invalid argument: ${arg}`);
       return this;
     }
     var next = this;
@@ -164,7 +162,7 @@ export class FixAngleLine extends PartialShape {
           destY = this.p.y.add(length.mul(Math.sin(angle)));
       next = new Point(this.p, new Point(destX, destY));
     } else {
-      log.warn(`Unrecognized indicator: ${cmd}`);
+      log.error(`Unrecognized indicator: ${cmd}`);
     }
     return next;
   }
