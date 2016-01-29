@@ -37,14 +37,14 @@ export class Shape {
 }
 
 export class PartialShape {
-  feedPoint() {
-    throw "NotImplemented";
+  feedPoint(message) {
+    return this;
   }
-  feedCommand() {
-    throw "NotImplemented";
+  feedCommand(message) {
+    return this;
   }
-  feedText() {
-    throw "NotImplemented";
+  feedText(message) {
+    return this;
   }
   feed(message) {
     switch (message.type) {
@@ -61,7 +61,7 @@ export class PartialShape {
         throw `Unknown data type: ${data.type}`
     }
   }
-  draw() {
+  draw(viewport, context) {
     throw "NotImplemented";
   }
 }

@@ -1,116 +1,172 @@
-import {StateMachine} from "../math/state-machine"
+import * as log from "../html/logging"
 import {Fraction} from "../math/fraction"
-import {Shape, ShapeType} from "./shape"
+import {PartialShape, Shape, ShapeType} from "./shape"
 import {Point} from "./point"
 
-export class PartialLine {
-  constructor() {
-    this.p1 = null;
-    this.p2 = null;
-    this.length = null;
-    this.angle = null;
-    this.ctrl = null;
-    this.type = ShapeType.Line;
-    this.machine = new StateMachine()
-      .state("start", {initial: true})
-      .state("p1")
-      .state("length")
-      .state("angle")
-      .state("p2", {ending: true})
-      .event("point", "start", "p1")
-      // length
-      .event("l", "p1", "length")
-      .event("point", "length", "p2")
-      .event("a", "length", "p2")
-      // angle
-      .event("a", "p1", "angle")
-      .event("point", "angle", "p2")
-      .event("l", "angle", "p2")
-      .begin();
+function extractCmdArg(input) {
+  var str = input.split(' ').filter(s => s != '');
+  var cmd = str[0], arg = str.pop().join(' ');
+  try {
+    arg = new Fraction(arg);
+    return [cmd, arg];
+  } catch(e) {
+    return [cmd, null]
+  }
+}
+
+// @param angle {Fraction}
+// @return {number}
+function convertAngle(angle) {
+  return angle.mod(360).div(360).mul(2).mul(Math.PI).valueOf()
+}
+
+export class EmptyLine extends PartialShape {
+  feedPoint(message) {
+    return new OnePointLine(message.p);
   }
 
-  feedPoint(data) {
-    var ret = this.machine.next("point");
-    if (!ret)
-      return this;
-    if (this.machine.current() === "p1")
-      this.p1 = data.p;
-    else
-      this.p2 = data.p;
-    return new Point(this.p1, this.p2);
-  }
+  draw(viewport, context) {}
+}
 
-  feedCommand(data) {
-    // TODO support ctrl
-    return this;
-  }
-
-  feedText(data) {
-    var str = data.s.split(' ').filter(function(s) { return s != ''; });
-    var cmd = str[0], arg = str[1];
-    var ret = this.machine.next(cmd);
-    if (ret) {
-      switch (cmd) {
-        case 'l':
-          this.length = new Fraction(arg);
-          break;
-        case 'a':
-          this.angle = (new Fraction(arg)).mod(360).div(360).mul(2).mul(Math.PI).valueOf();
-          break;
-        default:
-          throw `Should not reach here: ${cmd}`
-      }
-      if (this.machine.finished()) {
-        var x = this.p1.x.add(this.length.mul(Math.cos(this.angle)));
-        var y = this.p1.y.add(this.length.mul(Math.sin(this.angle)));
-        return new Line(this.p1, new Point(x, y))
-      }
-    }
-    return this;
+export class OnePointLine extends PartialShape {
+  constructor(p) {
+    super();
+    this.p = p;
   }
 
   draw(viewport, context) {
     context.beginPath();
-    context.moveTo(viewport.p2cx(this.p1.x), viewport.p2cy(this.p1.y));
-    switch (this.machine.current()) {
-      case "p1":
-        context.lineTo(viewport.cursorX, viewport.cursorY);
+    context.moveTo(viewport.p2cx(this.p.x), viewport.p2cy(this.p.y));
+    context.lineTo(viewport.cursorX, viewport.cursorY);
+    context.stroke();
+  }
+
+  feedPoint(message) {
+    return new Line(this.p, message.p);
+  }
+
+  feedText(message) {
+    var [cmd, arg] = extractCmdArg(message.s)
+    if (arg === null) {
+      log.warn(`Invalid argument: ${arg}`);
+      return this;
+    }
+    var next = this;
+    switch (cmd) {
+      case 'l':
+        next = new FixLengthLine(this.p, arg);
         break;
-      case "length":
-        var cursorX = viewport.c2px(viewport.cursorX),
-            cursorY = viewport.c2py(viewport.cursorY);
-        var dx = cursorX.sub(this.p1.x), dy = cursorY.sub(this.p1.y);
-        if (dx.eq(0)) {
-          var length = dy.gt(0) ? this.length : -this.length;
-          context.lineTo(viewport.p2cx(this.p1.x), viewport.p2cy(this.p1.y.add(length)));
-        }
-        else {
-          var dist = Math.sqrt(dx.mul(dx).pow(2).add(dy.mul(dy).pow(2)).valueOf());
-          var destX = this.p1.x.add(dx.div(dist).mul(this.length)),
-              destY = this.p1.y.add(dy.div(dist).mul(this.length));
-          context.lineTo(viewport.p2cx(destX), viewport.p2cy(destY));
-        }
+      case 'a':
+        next = new FixAngleLine(this.p, convertAngle(arg));
         break;
-      case "angle":
-        var cursorX = viewport.c2px(viewport.cursorX),
-            cursorY = viewport.c2py(viewport.cursorY);
-        var dx = cursorX.sub(this.p1.x), dy = cursorY.sub(this.p1.y);
-        if (dx.eq(0)) {
-          context.lineTo(viewport.p2cx(this.p1.x), viewport.p2cy(this.p1.y.add(dy)));
-        } else {
-          if (dx.abs().gt(dy.abs)) {
-            var dy = dx.mul(Math.tan(this.angle));
-          } else {
-            var dx = dy.div(Math.tan(this.angle));
-          }
-          context.lineTo(viewport.p2cx(this.p1.x.add(dx)), viewport.p2cy(this.p1.x.add(dy)));
-        }
+      default:
+        log.warn(`Unrecognized indicator: ${cmd}`);
         break;
-      case "p2":
-        context.moveTo(viewport.p2cx(this.p1.x), viewport.p2cy(this.p1.y));
-        context.lineTo(viewport.p2cx(this.p2.x), viewport.p2cy(this.p2.y));
+    }
+    return next;
+  }
+}
+
+export class FixLengthLine extends PartialShape {
+  // @param p {Point}
+  // @param length {Fraction}
+  constructor(p, length) {
+    super();
+    this.p = p;
+    this.length = length;
+  }
+
+  draw(viewport, context) {
+    context.beginPath();
+    context.moveTo(viewport.p2cx(this.p.x), viewport.p2cy(this.p.y));
+
+    var cursorX = viewport.c2px(viewport.cursorX),
+        cursorY = viewport.c2py(viewport.cursorY);
+    var dx = cursorX.sub(this.p.x), dy = cursorY.sub(this.p.y);
+    if (dx.eq(0)) {
+      var length = dy.gt(0) ? this.length : -this.length;
+      context.lineTo(viewport.p2cx(this.p.x), viewport.p2cy(this.p.y.add(length)));
+    }
+    else {
+      var dist = Math.sqrt(dx.mul(dx).pow(2).add(dy.mul(dy).pow(2)).valueOf());
+      var destX = this.p.x.add(dx.div(dist).mul(this.length)),
+          destY = this.p.y.add(dy.div(dist).mul(this.length));
+      context.lineTo(viewport.p2cx(destX), viewport.p2cy(destY));
     }
     context.stroke();
+  }
+
+  feedPoint(message) {
+    return new Line(this.p, message.p);
+  }
+
+  feedText(message) {
+    var [cmd, arg] = extractCmdArg(message.s)
+    if (arg === null) {
+      log.warn(`Invalid argument: ${arg}`);
+      return this;
+    }
+    var next = this;
+    if (cmd === 'a') {
+      var angle = convertAngle(arg);
+      var destX = this.p.x.add(this.length.mul(Math.cos(angle))),
+          destY = this.p.y.add(this.length.mul(Math.sin(angle)));
+      next = new Point(this.p, new Point(destX, destY));
+    } else {
+      log.warn(`Unrecognized indicator: ${cmd}`);
+    }
+    return next;
+  }
+}
+
+export class FixAngleLine extends PartialShape {
+  // @param p {Point}
+  // @param angle {number}
+  constructor(p, angle) {
+    super();
+    this.p = p;
+    this.angle = angle;
+  }
+
+  draw(viewport, context) {
+    context.beginPath();
+    context.moveTo(viewport.p2cx(this.p.x), viewport.p2cy(this.p.y));
+
+    var cursorX = viewport.c2px(viewport.cursorX),
+        cursorY = viewport.c2py(viewport.cursorY);
+    var dx = cursorX.sub(this.p1.x), dy = cursorY.sub(this.p1.y);
+    if (dx.eq(0)) {
+      context.lineTo(viewport.p2cx(this.p1.x), viewport.p2cy(this.p1.y.add(dy)));
+    } else {
+      if (dx.abs().gt(dy.abs)) {
+        var dy = dx.mul(Math.tan(this.angle));
+      } else {
+        var dx = dy.div(Math.tan(this.angle));
+      }
+      context.lineTo(viewport.p2cx(this.p1.x.add(dx)), viewport.p2cy(this.p1.x.add(dy)));
+    }
+    context.stroke();
+  }
+
+  feedPoint(message) {
+    return new Line(this.p, message.p);
+  }
+
+  feedText(message) {
+    var [cmd, arg] = extractCmdArg(message.s)
+    if (arg === null) {
+      log.warn(`Invalid argument: ${arg}`);
+      return this;
+    }
+    var next = this;
+    if (cmd === 'l') {
+      var destX = this.p.x.add(length.mul(Math.cos(angle))),
+          destY = this.p.y.add(length.mul(Math.sin(angle)));
+      next = new Point(this.p, new Point(destX, destY));
+    } else {
+      log.warn(`Unrecognized indicator: ${cmd}`);
+    }
+    return next;
   }
 }
 
