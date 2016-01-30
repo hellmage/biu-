@@ -18,7 +18,7 @@ function extractCmdArg(input) {
 // @param angle {Fraction}
 // @return {number}
 function convertAngle(angle) {
-  return angle.mod(360).div(360).mul(2).mul(Math.PI).valueOf()
+  return new Fraction(angle).mod(360).div(360).mul(2).mul(Math.PI).valueOf()
 }
 
 class PartialLine extends PartialShape {
@@ -60,17 +60,10 @@ export class OnePointLine extends PartialLine {
       return this;
     }
     var next = this;
-    switch (cmd) {
-      case 'l': // here length refers to distance on the plane
-        next = new FixLengthLine(this.p, arg);
-        break;
-      case 'a':
-        next = new FixAngleLine(this.p, convertAngle(arg));
-        break;
-      default:
-        log.error(`Unrecognized subcommand: ${cmd}`);
-        break;
-    }
+    if (cmd === 'l') // here length refers to distance on the plane
+      next = new FixLengthLine(this.p, arg);
+    else
+      log.error(`Unrecognized subcommand: ${cmd}`);
     return next;
   }
 }
@@ -121,52 +114,6 @@ export class FixLengthLine extends PartialLine {
       var angle = convertAngle(arg);
       var destX = this.p.x.add(this.length.mul(Math.cos(angle))),
           destY = this.p.y.add(this.length.mul(Math.sin(angle)));
-      next = new Line(this.p, new Point(destX, destY));
-    } else {
-      log.error(`Unrecognized subcommand: ${cmd}`);
-    }
-    return next;
-  }
-}
-
-export class FixAngleLine extends PartialLine {
-  // @param p {Point}
-  // @param angle {number}
-  constructor(p, angle) {
-    super();
-    this.p = p;
-    this.angle = angle;
-  }
-
-  _drawTo(viewport) {
-    var cursorX = viewport.c2px(viewport.cursorX),
-        cursorY = viewport.c2py(viewport.cursorY);
-    var dx = cursorX.sub(this.p1.x), dy = cursorY.sub(this.p1.y);
-    if (dx.eq(0)) {
-      return [viewport.p2cx(this.p1.x), viewport.p2cy(this.p1.y.add(dy))];
-    } else {
-      if (dx.abs().gt(dy.abs)) {
-        var dy = dx.mul(Math.tan(this.angle));
-      } else {
-        var dx = dy.div(Math.tan(this.angle));
-      }
-      return [viewport.p2cx(this.p1.x.add(dx)), viewport.p2cy(this.p1.x.add(dy))];
-    }
-  }
-
-  feedPoint(message) {
-    return new Line(this.p, message.p);
-  }
-
-  feedText(message) {
-    var [cmd, arg] = extractCmdArg(message.s)
-    if (arg === null) {
-      return this;
-    }
-    var next = this;
-    if (cmd === 'l') {
-      var destX = this.p.x.add(length.mul(Math.cos(angle))),
-          destY = this.p.y.add(length.mul(Math.sin(angle)));
       next = new Line(this.p, new Point(destX, destY));
     } else {
       log.error(`Unrecognized subcommand: ${cmd}`);

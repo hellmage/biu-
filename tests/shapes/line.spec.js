@@ -4,7 +4,7 @@ import {assert} from "../utils/assert";
 import {Fraction} from "../../src/math/fraction";
 import {ShapeType} from "../../src/shapes/shape";
 import {Point} from "../../src/shapes/point";
-import {Line, EmptyLine, OnePointLine, FixLengthLine, FixAngleLine} from "../../src/shapes/line";
+import {Line, EmptyLine, OnePointLine, FixLengthLine} from "../../src/shapes/line";
 import {ViewPort} from "../../src/viewport";
 
 describe("Line", function() {
@@ -189,13 +189,6 @@ describe("OnePointLine", function() {
       assert.true(next instanceof FixLengthLine);
       assert.true(next.p.equals(new Point(0, 0)));
       assert.equal(next.length, 10);
-    });
-    it("returns FixLengthLine for 'a' subcommand", function() {
-      var l = new OnePointLine(new Point(0, 0));
-      var next = l.feedText({s: 'a 30'});
-      assert.true(next instanceof FixAngleLine);
-      assert.true(next.p.equals(new Point(0, 0)));
-      assert.equal(next.angle.toPrecision(2), '0.52');
     });
     it("returns itself for invalid argument", function() {
       var errorspy = sinon.spy();
