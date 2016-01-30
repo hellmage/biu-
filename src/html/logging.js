@@ -33,4 +33,5 @@ function log(level, message) {
   if (container.children.length >= LogCountMax)
     container.removeChild(container.childNodes[0]);
   container.innerHTML += `<p>[<span style='font-color:black'>${level.toUpperCase()}</span>]${message}</p>`;
+  container.scrollTop = container.scrollHeight;
 }
