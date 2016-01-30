@@ -21,25 +21,33 @@ function convertAngle(angle) {
   return angle.mod(360).div(360).mul(2).mul(Math.PI).valueOf()
 }
 
-export class EmptyLine extends PartialShape {
+class PartialLine extends PartialShape {
+  _drawTo(viewport) {
+    throw "NotImplemented";
+  }
+  draw(viewport, context) {
+    var [destX, destY] = this._drawTo(viewport);
+    context.beginPath();
+    context.moveTo(viewport.p2cx(this.p.x), viewport.p2cy(this.p.y));
+    context.lineTo(destX, destY);
+    context.stroke();
+  }
+}
+
+export class EmptyLine extends PartialLine {
   feedPoint(message) {
     return new OnePointLine(message.p);
   }
-
-  draw(viewport, context) {}
 }
 
-export class OnePointLine extends PartialShape {
+export class OnePointLine extends PartialLine {
   constructor(p) {
     super();
     this.p = p;
   }
 
-  draw(viewport, context) {
-    context.beginPath();
-    context.moveTo(viewport.p2cx(this.p.x), viewport.p2cy(this.p.y));
-    context.lineTo(viewport.cursorX, viewport.cursorY);
-    context.stroke();
+  _drawTo(viewport) {
+    return [viewport.cursorX, viewport.cursorY];
   }
 
   feedPoint(message) {
@@ -67,7 +75,7 @@ export class OnePointLine extends PartialShape {
   }
 }
 
-export class FixLengthLine extends PartialShape {
+export class FixLengthLine extends PartialLine {
   // @param p {Point}
   // @param length {Fraction}
   constructor(p, length) {
@@ -76,28 +84,31 @@ export class FixLengthLine extends PartialShape {
     this.length = length;
   }
 
-  draw(viewport, context) {
-    context.beginPath();
-    context.moveTo(viewport.p2cx(this.p.x), viewport.p2cy(this.p.y));
-
-    var cursorX = viewport.c2px(viewport.cursorX),
-        cursorY = viewport.c2py(viewport.cursorY);
-    var dx = cursorX.sub(this.p.x), dy = cursorY.sub(this.p.y);
+  // given a point on the plane(usually a click), return the ending point of fix-length line
+  _dest(px, py) {
+    var dx = px.sub(this.p.x), dy = py.sub(this.p.y);
     if (dx.eq(0)) {
       var length = dy.gt(0) ? this.length : -this.length;
-      context.lineTo(viewport.p2cx(this.p.x), viewport.p2cy(this.p.y.add(length)));
+      return [this.p.x, this.p.y.add(length)];
     }
     else {
-      var dist = Math.sqrt(dx.mul(dx).pow(2).add(dy.mul(dy).pow(2)).valueOf());
+      var dist = Math.sqrt(dx.pow(2).add(dy.pow(2)).valueOf());
       var destX = this.p.x.add(dx.div(dist).mul(this.length)),
           destY = this.p.y.add(dy.div(dist).mul(this.length));
-      context.lineTo(viewport.p2cx(destX), viewport.p2cy(destY));
+      return [destX, destY];
     }
-    context.stroke();
+  }
+
+  _drawTo(viewport) {
+    var cursorX = viewport.c2px(viewport.cursorX),
+        cursorY = viewport.c2py(viewport.cursorY);
+    var [destX, destY] = this._dest(cursorX, cursorY);
+    return [viewport.p2cx(destX), viewport.p2cy(destY)];
   }
 
   feedPoint(message) {
-    return new Line(this.p, message.p);
+    var [destX, destY] = this._dest(message.p.x, message.p.y);
+    return new Line(this.p, new Point(destX, destY));
   }
 
   feedText(message) {
@@ -110,15 +121,15 @@ export class FixLengthLine extends PartialShape {
       var angle = convertAngle(arg);
       var destX = this.p.x.add(this.length.mul(Math.cos(angle))),
           destY = this.p.y.add(this.length.mul(Math.sin(angle)));
-      next = new Point(this.p, new Point(destX, destY));
+      next = new Line(this.p, new Point(destX, destY));
     } else {
-      log.error(`Unrecognized indicator: ${cmd}`);
+      log.error(`Unrecognized subcommand: ${cmd}`);
     }
     return next;
   }
 }
 
-export class FixAngleLine extends PartialShape {
+export class FixAngleLine extends PartialLine {
   // @param p {Point}
   // @param angle {number}
   constructor(p, angle) {
@@ -127,24 +138,20 @@ export class FixAngleLine extends PartialShape {
     this.angle = angle;
   }
 
-  draw(viewport, context) {
-    context.beginPath();
-    context.moveTo(viewport.p2cx(this.p.x), viewport.p2cy(this.p.y));
-
+  _drawTo(viewport) {
     var cursorX = viewport.c2px(viewport.cursorX),
         cursorY = viewport.c2py(viewport.cursorY);
     var dx = cursorX.sub(this.p1.x), dy = cursorY.sub(this.p1.y);
     if (dx.eq(0)) {
-      context.lineTo(viewport.p2cx(this.p1.x), viewport.p2cy(this.p1.y.add(dy)));
+      return [viewport.p2cx(this.p1.x), viewport.p2cy(this.p1.y.add(dy))];
     } else {
       if (dx.abs().gt(dy.abs)) {
         var dy = dx.mul(Math.tan(this.angle));
       } else {
         var dx = dy.div(Math.tan(this.angle));
       }
-      context.lineTo(viewport.p2cx(this.p1.x.add(dx)), viewport.p2cy(this.p1.x.add(dy)));
+      return [viewport.p2cx(this.p1.x.add(dx)), viewport.p2cy(this.p1.x.add(dy))];
     }
-    context.stroke();
   }
 
   feedPoint(message) {
@@ -160,9 +167,9 @@ export class FixAngleLine extends PartialShape {
     if (cmd === 'l') {
       var destX = this.p.x.add(length.mul(Math.cos(angle))),
           destY = this.p.y.add(length.mul(Math.sin(angle)));
-      next = new Point(this.p, new Point(destX, destY));
+      next = new Line(this.p, new Point(destX, destY));
     } else {
-      log.error(`Unrecognized indicator: ${cmd}`);
+      log.error(`Unrecognized subcommand: ${cmd}`);
     }
     return next;
   }

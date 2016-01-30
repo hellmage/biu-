@@ -20,7 +20,7 @@
     "webpack": "^1.12.12"
   },
   "scripts": {
-    "test": "mocha --compilers js:babel-core/register tests/**/*.js"
+    "test": "mocha --compilers js:babel-core/register tests/*.js tests/**/*.js"
   },
   "repository": {
     "type": "git",

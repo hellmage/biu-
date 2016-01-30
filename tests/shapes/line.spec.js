@@ -84,7 +84,7 @@ describe("Line", function() {
         var vp = new ViewPort(20, 20);
         var nl = l.intersect(vp);
         var expectedP1 = new Point(new Fraction(-25, 3), -10);
-        var expectedP2 = new Point(new Fraction(-5, 3), 10);
+        var expectedP2 = new Point(new Fraction(-5, 3), new Fraction(10));
         assert.true(nl.p1.equals(expectedP1));
         assert.true(nl.p2.equals(expectedP2));
       });
@@ -175,9 +175,6 @@ describe("OnePointLine", function() {
   });
   describe(".feedText", function() {
     var lineStub = {
-      warn: function(message) {
-        // pass
-      },
       error: function(message) {
         // pass
       }
@@ -214,6 +211,87 @@ describe("OnePointLine", function() {
       var l = new line.OnePointLine(new Point(0, 0));
       var next = l.feedText({s: 'cmd 123'});
       assert.true(next instanceof line.OnePointLine);
+      assert.true(errorspy.calledWith("Unrecognized subcommand: cmd"));
+    });
+  });
+  describe("._drawTo", function() {
+    it("cursor position",function() {
+      var l = new OnePointLine(new Point(0, 0));
+      var [destX, destY] = l._drawTo({cursorX: 10, cursorY: -10});
+      assert.equal(destX, 10);
+      assert.equal(destY, -10);
+    });
+  });
+});
+
+describe("FixLengthLine", function() {
+  describe(".feedPoint", function() {
+    describe("returns an instance of Line", function() {
+      it("when the line goes straight up", function() {
+        var l = new FixLengthLine(new Point(0, 0), new Fraction(10));
+        var next = l.feedPoint({p: new Point(0, 1)});
+        assert.equal(next.type, ShapeType.Line);
+        assert.true(next.p1.equals(new Point(0, 0)));
+        assert.true(next.p2.equals(new Point(0, 10)));
+      });
+      it("when the line goes straight down", function() {
+        var l = new FixLengthLine(new Point(0, 0), new Fraction(10));
+        var next = l.feedPoint({p: new Point(0, -1)});
+        assert.equal(next.type, ShapeType.Line);
+        assert.true(next.p1.equals(new Point(0, 0)));
+        assert.true(next.p2.equals(new Point(0, -10)));
+      });
+      it("given a point of arbitary position", function() {
+        var l = new FixLengthLine(new Point(0, 0), new Fraction(10));
+        var next = l.feedPoint({p: new Point(5, 10)});
+        assert.equal(next.type, ShapeType.Line);
+        assert.true(next.p1.equals(new Point(0, 0)));
+        assert.equal(next.p2.x.valueOf().toPrecision(3), '4.47');
+        assert.equal(next.p2.y.valueOf().toPrecision(3), '8.94');
+      });
+    });
+  });
+  describe(".feedCommand", function() {
+    it("returns itself", function() {
+      var l = new FixLengthLine(new Point(0, 0), new Fraction(10));
+      var next = l.feedCommand({code: 123});
+      assert.true(next instanceof FixLengthLine);
+      assert.true(l.p.equals(new Point(0, 0)));
+      assert.equal(l.length, 10);
+    });
+  });
+  describe(".feedText", function() {
+    var lineStub = {
+      error: function(message) {
+        // pass
+      }
+    }
+    var line = proxyquire('../../src/shapes/line', {
+      '../html/logging': lineStub
+    })
+
+    it("returns Line for 'a' subcommand", function() {
+      var l = new FixLengthLine(new Point(0, 0), new Fraction(10));
+      var next = l.feedText({s: 'a 30'});
+      assert.equal(next.type, ShapeType.Line);
+      assert.true(next.p1.equals(new Point(0, 0)));
+      assert.equal(next.p2.x.valueOf().toPrecision(3), '8.66');
+      assert.true(next.p2.y.eq(5));
+    });
+    it("returns itself for invalid argument", function() {
+      var errorspy = sinon.spy();
+      lineStub.error = errorspy;
+      var l = new line.FixLengthLine(new Point(0, 0), new Fraction(10));
+      var next = l.feedText({s: 'a 30degrees'});
+      assert.true(next instanceof line.FixLengthLine);
+      assert.true(errorspy.calledWith("Invalid argument: a 30degrees"));
+    });
+    it("returns itself for unknown subcommand", function() {
+      var errorspy = sinon.spy();
+      lineStub.error = errorspy;
+      var l = new line.FixLengthLine(new Point(0, 0), new Fraction(10));
+      var next = l.feedText({s: 'cmd 123'});
+      assert.true(next instanceof line.FixLengthLine);
       assert.true(errorspy.calledWith("Unrecognized subcommand: cmd"));
     });
   });
