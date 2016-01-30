@@ -1,3 +1,6 @@
+import * as log from "./logging"
+import {ShapeType} from "../shapes/shape"
+
 export const Channels = {  // Enum
   AUTOCAT: "autocat"
 }
@@ -32,6 +35,27 @@ export function emit(channel, message) {
   wormhole.dispatchEvent(event);
 }
 
+
+function receive(evt) {
+  var message = evt;
+  if ('detail' in evt)
+    message = evt.detail;
+  log.info(`[${message.type}]${message.data}`);
+
+  if (autocat.plane.drawingShape) {
+    var s = autocat.plane.drawingShape;
+    var ret = s.feed(message);
+    if (ret)
+      if (ret.type !== ShapeType.Partial) {
+        autocat.plane.shapes.push(ret);
+        autocat.plane.drawingShape = null;
+        autocat.updateVisibleShapes();
+      } else {
+        autocat.plane.drawingShape = ret;
+      }
+  }
+}
+
 export function init() {
-  document.getElementById("wormhole").addEventListener(Channels.AUTOCAT, autocat.receive);
+  document.getElementById("wormhole").addEventListener(Channels.AUTOCAT, receive);
 }

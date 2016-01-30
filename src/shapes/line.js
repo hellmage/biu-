@@ -11,7 +11,7 @@ function extractCmdArg(input) {
     return [cmd, arg];
   } catch(e) {
     log.error(`Invalid argument: ${input}`);
-    return [cmd, null]
+    return [cmd, null];
   }
 }
 
@@ -38,6 +38,7 @@ export class EmptyLine extends PartialLine {
   feedPoint(message) {
     return new OnePointLine(message.p);
   }
+  draw(viewport, context) {}
 }
 
 export class OnePointLine extends PartialLine {

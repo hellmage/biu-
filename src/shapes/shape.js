@@ -1,3 +1,5 @@
+import {UserInputType} from "../html/wormhole"
+
 // interface
 export class Shape {
 
@@ -37,6 +39,9 @@ export class Shape {
 }
 
 export class PartialShape {
+  constructor() {
+    this.type = ShapeType.Partial;
+  }
   feedPoint(message) {
     return this;
   }
@@ -47,19 +52,21 @@ export class PartialShape {
     return this;
   }
   feed(message) {
+    var next = null;
     switch (message.type) {
       case UserInputType.M:
-        this.feedPoint(message.data);
+        next = this.feedPoint(message.data);
         break;
       case UserInputType.G:
-        this.feedCommand(message.data);
+        next = this.feedCommand(message.data);
         break;
       case UserInputType.T:
-        this.feedText(message.data);
+        next = this.feedText(message.data);
         break;
       default:
         throw `Unknown data type: ${data.type}`
     }
+    return next;
   }
   draw(viewport, context) {
     throw "NotImplemented";
@@ -67,6 +74,7 @@ export class PartialShape {
 }
 
 export const ShapeType = {  // Enum
+  Partial: "partial",
   Point: "point",
   Line: "line",
   MultiLine: "multiline",

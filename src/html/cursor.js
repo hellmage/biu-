@@ -42,7 +42,7 @@ export function init() {
 
 const Radius = 40;  // pixels on canvas
 
-export function draw(context, viewport) {
+export function draw(viewport, context) {
   var cx = viewport.cursorX, cy = viewport.cursorY;
   if (!cx || !cy)
     return;

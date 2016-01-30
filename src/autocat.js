@@ -13,17 +13,17 @@ export class AutoCAT {
   // @param dir: Direction
   move(dir) {
     this.viewport.move(dir);
-    this.plane.updateVisibleShapes(this.viewport);
+    this.updateVisibleShapes();
   }
 
   zoomin() {
     this.viewport.zoom(-0.1);
-    this.plane.updateVisibleShapes(this.viewport);
+    this.updateVisibleShapes();
   }
 
   zoomout() {
     this.viewport.zoom(0.1);
-    this.plane.updateVisibleShapes(this.viewport);
+    this.updateVisibleShapes();
   }
 
   updateVisibleShapes() {
@@ -37,13 +37,8 @@ export class AutoCAT {
       var shape = this.plane.visibleShapes[i];
       shape.draw(this.viewport, ctx);
     }
-    Cursor.draw(ctx, this.viewport);
-  }
-
-  receive(evt) {
-    var message = evt;
-    if ('detail' in evt)
-      message = evt.detail;
-    log.info(`[${message.type}]${message.data}`);
+    if (this.plane.drawingShape)
+      this.plane.drawingShape.draw(this.viewport, ctx);
+    Cursor.draw(this.viewport, ctx);
   }
 }
