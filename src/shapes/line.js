@@ -2,6 +2,7 @@ import * as log from "../html/logging";
 import {Fraction} from "../math/fraction";
 import {PartialShape, Shape, ShapeType} from "./shape";
 import {Point} from "./point";
+import {degrees2radians} from "./utils"
 
 function extractCmdArg(input) {
   var str = input.split(' ').filter(s => s != '');
@@ -13,12 +14,6 @@ function extractCmdArg(input) {
     log.error(`Invalid argument: ${input}`);
     return [cmd, null];
   }
-}
-
-// @param angle {Fraction}
-// @return {number}
-function convertAngle(angle) {
-  return new Fraction(angle).mod(360).div(360).mul(2).mul(Math.PI).valueOf()
 }
 
 class PartialLine extends PartialShape {
@@ -112,7 +107,7 @@ export class FixLengthLine extends PartialLine {
     }
     var next = this;
     if (cmd === 'a') {
-      var angle = convertAngle(arg);
+      var angle = degrees2radians(arg).valueOf();
       var destX = this.p.x.add(this.length.mul(Math.cos(angle))),
           destY = this.p.y.add(this.length.mul(Math.sin(angle)));
       next = new Line(this.p, new Point(destX, destY));
