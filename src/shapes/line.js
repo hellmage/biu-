@@ -17,6 +17,7 @@ function extractCmdArg(input) {
 }
 
 class PartialLine extends PartialShape {
+  // @returns [destX, destY] [{number}, {number}] on canvas
   _drawTo(viewport) {
     throw "NotImplemented";
   }
