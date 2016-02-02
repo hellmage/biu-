@@ -17,4 +17,13 @@ export class Circle {
   toString() {
     return `c:${this.center},r:${this.radius.valueOf()}`;
   }
+
+  intersect(viewport) {
+    super(viewport);
+  }
+
+  draw(viewport, context) {
+    context.beginPath();
+    context.stroke();
+  }
 }

@@ -77,6 +77,7 @@ export class TwoPointArc extends PartialArc {
       ];
     }
 
+    // given an angle, convert it to range [0, Math.PI * 2]
     function normalize(ap, angle, centerx, centery) {
       if (Math.abs(angle - 1) < 0.00001)
         angle = 0;
@@ -94,33 +95,47 @@ export class TwoPointArc extends PartialArc {
       return normalized;
     }
 
+    var startAngle = null, endAngle = null, side = new Fraction(1), radius = 5, crossX = new Fraction(0), crossY = new Fraction(-2.5);
+
     var [k1, b1] = kb(this.p1, this.p2),
         [k2, b2] = kb(this.p2, p);
+    if (k1.eq(k2)) {  // the three points are on one line
+      return [null, null, null, null, null, null];
+    }
     var crossX = b1.sub(b2).div(k2.sub(k1)),
         crossY = k2.mul(b1).sub(k1.mul(b2)).div(k2.sub(k1));  // center
     var radius = Math.sqrt(crossX.sub(this.p1.x).pow(2).add(crossY.sub(this.p1.y).pow(2)).valueOf());
     var startAngle = normalize(this.p1, Math.atan(this.p1.y.sub(crossY).div(this.p1.x.sub(crossX)).valueOf()), crossX, crossY),
-        endAngle = normalize(p, Math.atan(p.y.sub(crossY).div(p.x.sub(crossX)).valueOf()) crossX, crossY);
+        endAngle = normalize(p, Math.atan(p.y.sub(crossY).div(p.x.sub(crossX)).valueOf()), crossX, crossY);
+    var k = this.p2.y.sub(this.p1.y).div(this.p2.x.sub(this.p1.x)),
+        b = this.p2.y.mul(this.p1.x).sub(this.p1.y.mul(this.p2.x)).div(this.p2.x.sub(this.p1.x));
+    var side = p.x.mul(k).add(b);
+    // the 3rd point is on the upper side of the line described by this.p1 and this.p2
     var anticlockwise = true;
-    if (angle1 > angle3)
+    if (side.lt(0))
+      // the 3rd point is on the lower side of the line described by this.p1 and this.p2
       anticlockwise = false;
     return [crossX, crossY, radius, startAngle, endAngle, anticlockwise];
   }
   feedPoint(message) {
     var [crossX, crossY, radius, startAngle, endAngle, anticlockwise] = this._findArc(message.p);
+    if (crossX === null)
+      return this;
     return new Arc(new Point(crossX, crossY), radius, startAngle, endAngle, anticlockwise);
   }
   draw(viewport, context) {
     var [crossX, crossY, radius, startAngle, endAngle, anticlockwise] = this._findArc(viewport.cursor());
     context.beginPath();
-    context.arc(
-      crossX.valueOf(),
-      crossY.valueOf(),
-      radius.valueOf(),
-      startAngle.valueOf(),
-      endAngle.valueOf(),
-      anticlockwise
-    )
+    if (crossX === null) {
+      context.arc(
+        crossX.valueOf(),
+        crossY.valueOf(),
+        radius.valueOf(),
+        startAngle.valueOf(),
+        endAngle.valueOf(),
+        anticlockwise
+      )
+    }
     context.moveTo(viewport.p2cx(this.p1.x), viewport.p2cy(this.p1.y));
     context.lineTo(viewport.p2cx(this.p2.x), viewport.p2cy(this.p2.y));
     context.lineTo(viewport.cursorX, viewport.cursorY);
