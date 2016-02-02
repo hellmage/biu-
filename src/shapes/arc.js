@@ -73,7 +73,7 @@ export class TwoPointArc extends PartialArc {
     function kb(p1, p2) {
       return [
         p1.x.sub(p2.x).div(p2.y.sub(p1.y)),
-        p2.y.pow(2).sub(p1.y.pow(2)).add(p2.x.pow(2)).sub(p2.x.pow(2)).div(p2.y.sub(p1.y).mul(2))
+        p2.y.pow(2).sub(p1.y.pow(2)).add(p2.x.pow(2)).sub(p1.x.pow(2)).div(p2.y.sub(p1.y).mul(2))
       ];
     }
 
@@ -104,17 +104,32 @@ export class TwoPointArc extends PartialArc {
     }
     var crossX = b1.sub(b2).div(k2.sub(k1)),
         crossY = k2.mul(b1).sub(k1.mul(b2)).div(k2.sub(k1));  // center
+    console.log(`x=${crossX}, y=${crossY}`);
     var radius = Math.sqrt(crossX.sub(this.p1.x).pow(2).add(crossY.sub(this.p1.y).pow(2)).valueOf());
-    var startAngle = normalize(this.p1, Math.atan(this.p1.y.sub(crossY).div(this.p1.x.sub(crossX)).valueOf()), crossX, crossY),
-        endAngle = normalize(p, Math.atan(p.y.sub(crossY).div(p.x.sub(crossX)).valueOf()), crossX, crossY);
-    var k = this.p2.y.sub(this.p1.y).div(this.p2.x.sub(this.p1.x)),
-        b = this.p2.y.mul(this.p1.x).sub(this.p1.y.mul(this.p2.x)).div(this.p2.x.sub(this.p1.x));
-    var side = p.x.mul(k).add(b);
-    // the 3rd point is on the upper side of the line described by this.p1 and this.p2
+    console.log(`r=${radius}`)
+    var startAngle = Math.PI / 2;
+    if (this.p1.x.ne(crossX))
+      startAngle = normalize(this.p1, Math.atan(this.p1.y.sub(crossY).div(this.p1.x.sub(crossX)).valueOf()), crossX, crossY);
+    var endAngle = Math.PI / 2;
+    if (p.x.ne(crossX))
+      endAngle = normalize(p, Math.atan(p.y.sub(crossY).div(p.x.sub(crossX)).valueOf()), crossX, crossY);
+    console.log(`s=${startAngle}, e=${endAngle}`)
     var anticlockwise = true;
-    if (side.lt(0))
-      // the 3rd point is on the lower side of the line described by this.p1 and this.p2
-      anticlockwise = false;
+    if (this.p1.x.eq(this.p2.x)) {
+      if (this.p.x.lt(this.p1.x))
+        anticlockwise = false;
+    }
+    else {
+      var k = this.p2.y.sub(this.p1.y).div(this.p2.x.sub(this.p1.x)),
+          b = this.p2.y.mul(this.p1.x).sub(this.p1.y.mul(this.p2.x)).div(this.p2.x.sub(this.p1.x));
+      var side = p.x.mul(k).add(b);
+      // the 3rd point is on the upper side of the line described by this.p1 and this.p2
+      if (side.lt(0))
+        // the 3rd point is on the lower side of the line described by this.p1 and this.p2
+        anticlockwise = false;
+    }
+
+
     return [crossX, crossY, radius, startAngle, endAngle, anticlockwise];
   }
   feedPoint(message) {

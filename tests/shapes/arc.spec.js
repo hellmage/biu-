@@ -56,10 +56,26 @@ describe("OnePointArc", function() {
 
 describe("TwoPointArc", function() {
   describe("._findArc", function() {
-    var arc = new TwoPointArc(new Point(5, 0), new Point(2.5, 2.5));
-    var [crossX, crossY, radius, startAngle, endAngle] = arc._findArc(new Point(0, -5));
-    assert.true(crossX.eq(0), crossX);
-    assert.true(crossY.eq(0), crossY);
+    it("anticlockwise", function() {
+      var arc = new TwoPointArc(new Point(5, 0), new Point(2.5, 2.5));
+      var [crossX, crossY, radius, startAngle, endAngle, anticlockwise] = arc._findArc(new Point(-5, 0));
+      assert.true(crossX.eq(0), crossX);
+      assert.true(crossY.eq(-2.5), crossY);
+      assert.equal(radius.toPrecision(3), '5.59');
+      assert.equal(startAngle.toPrecision(2), '0.46');
+      assert.equal(endAngle.toPrecision(3), '2.68');
+      assert.true(anticlockwise);
+    });
+    it("clockwise", function() {
+      var arc = new TwoPointArc(new Point(2.5, 2.5), new Point(5, 0));
+      var [crossX, crossY, radius, startAngle, endAngle, anticlockwise] = arc._findArc(new Point(-5, 0));
+      assert.true(crossX.eq(0), crossX);
+      assert.true(crossY.eq(-2.5), crossY);
+      assert.equal(radius.toPrecision(3), '5.59');
+      assert.equal(startAngle.toPrecision(3), '1.11');
+      assert.equal(endAngle.toPrecision(3), '2.68');
+      assert.false(anticlockwise);
+    });
   });
 });
 
