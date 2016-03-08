@@ -16,6 +16,30 @@ const ArcCmdMap = {
   'c': HowToDrawAnArc.CIRCLE
 };
 
+// given the center of the circle, return the angle of arbitary points on the
+// circle
+function toCircularAngle(cx, cy, x, y) {
+  if (y.eq(cy)) {
+    if (x.gte(cx)) {
+      return new Fraction(0);
+    } else {
+      return new Fraction(Math.PI);
+    }
+  }
+  if (x.eq(cx)) {
+    if (y.gte(cy)) {
+      return new Fraction(Math.PI).div(2);
+    } else {
+      return new Fraction(Math.PI).mul(3).div(2);
+    }
+  }
+  var angle = Math.atan2(y.sub(cy).valueOf(), x.sub(cx).valueOf());
+  if (y.lt(cy)) {
+    angle += Math.PI;
+  }
+  return new Fraction(angle);
+}
+
 class PartialArc extends PartialShape {}
 
 export class EmptyArc extends PartialArc {
@@ -68,83 +92,55 @@ export class TwoPointArc extends PartialArc {
     this.p2 = p2;
   }
   _findArc(p) {
-    // given the line described by two points p1 & p2,
-    // find the perpendicular line described by the 'k' and 'b' (kx + b = y)
-    function kb(p1, p2) {
-      return [
-        p1.x.sub(p2.x).div(p2.y.sub(p1.y)),
-        p2.y.pow(2).sub(p1.y.pow(2)).add(p2.x.pow(2)).sub(p1.x.pow(2)).div(p2.y.sub(p1.y).mul(2))
-      ];
-    }
-
-    // given an angle, convert it to range [0, Math.PI * 2]
-    function normalize(ap, angle, centerx, centery) {
-      if (Math.abs(angle - 1) < 0.00001)
-        angle = 0;
-      var normalized = angle;
-      if (angle > 0) {
-        if (ap.x.lt(centerx)) {
-          normalized = angle + Math.PI;
-        }
-      } else {
-        normalized = angle + Math.PI;
-        if (ap.x.gt(centerx)) {
-          normalized = angle + Math.PI;
-        }
+    var p1 = this.p1, p2 = this.p2, p3 = p;
+    var x1 = p1.x, y1 = p1.y, x2 = p2.x, y2 = p2.y, x3 = p3.x, y3 = p3.y;
+    var dx21 = x2.sub(x1), dy21 = y2.sub(y1), dx32 = x3.sub(x2), dy32 = y3.sub(y2);
+    if (dx21.mul(dy32).eq(dx32.mul(dy21)))
+      return null;  // the three points are on the same line
+    // (x-a)^2+(y-b)^2=0
+    var z1 = x1.pow(2).add(y1.pow(2)), z2 = x2.pow(2).add(y2.pow(2)), z3 = x3.pow(2).add(y3.pow(2));
+    var centerX = y1.sub(y2).mul(z3.sub(z2)).sub(y2.sub(y3).mul(z2.sub(z1)))
+                  .div(y1.sub(y2).mul(x2.sub(x3)).sub(y2.sub(y3).mul(x1.sub(x2))))
+                  .div(-2),   // a
+        centerY = z2.sub(z1).mul(x2.sub(x3)).sub(z3.sub(z2).mul(x1.sub(x2)))
+                  .div(y1.sub(y2).mul(x2.sub(x3)).sub(y2.sub(y3).mul(x1.sub(x2))))
+                  .div(-2);   // b
+    var radius = new Fraction(Math.sqrt(x1.sub(centerX).pow(2).add(y1.sub(centerY).pow(2)).valueOf()));
+    var startAngle = toCircularAngle(centerX, centerY, x1, y1),
+        midAngle = toCircularAngle(centerX, centerY, x2, y2),
+        endAngle = toCircularAngle(centerX, centerY, x3, y3);
+    var anticlockwise = false;
+    if (midAngle >= startAngle) {
+      if (endAngle >= midAngle || endAngle <= startAngle) {
+        anticlockwise = true;
       }
-      return normalized;
-    }
-
-    var startAngle = null, endAngle = null, side = new Fraction(1), radius = 5, crossX = new Fraction(0), crossY = new Fraction(-2.5);
-
-    var [k1, b1] = kb(this.p1, this.p2),
-        [k2, b2] = kb(this.p2, p);
-    if (k1.eq(k2)) {  // the three points are on one line
-      return [null, null, null, null, null, null];
-    }
-    var crossX = b1.sub(b2).div(k2.sub(k1)),
-        crossY = k2.mul(b1).sub(k1.mul(b2)).div(k2.sub(k1));  // center
-    console.log(`x=${crossX}, y=${crossY}`);
-    var radius = Math.sqrt(crossX.sub(this.p1.x).pow(2).add(crossY.sub(this.p1.y).pow(2)).valueOf());
-    console.log(`r=${radius}`)
-    var startAngle = Math.PI / 2;
-    if (this.p1.x.ne(crossX))
-      startAngle = normalize(this.p1, Math.atan(this.p1.y.sub(crossY).div(this.p1.x.sub(crossX)).valueOf()), crossX, crossY);
-    var endAngle = Math.PI / 2;
-    if (p.x.ne(crossX))
-      endAngle = normalize(p, Math.atan(p.y.sub(crossY).div(p.x.sub(crossX)).valueOf()), crossX, crossY);
-    console.log(`s=${startAngle}, e=${endAngle}`)
-    var anticlockwise = true;
-    if (this.p1.x.eq(this.p2.x)) {
-      if (this.p.x.lt(this.p1.x))
+      else {
         anticlockwise = false;
-    }
-    else {
-      var k = this.p2.y.sub(this.p1.y).div(this.p2.x.sub(this.p1.x)),
-          b = this.p2.y.mul(this.p1.x).sub(this.p1.y.mul(this.p2.x)).div(this.p2.x.sub(this.p1.x));
-      var side = p.x.mul(k).add(b);
-      // the 3rd point is on the upper side of the line described by this.p1 and this.p2
-      if (side.lt(0))
-        // the 3rd point is on the lower side of the line described by this.p1 and this.p2
+      }
+    } else {
+      if (endAngle >= startAngle || endAngle <= midAngle) {
         anticlockwise = false;
+      } else {
+        anticlockwise = true
+      }
     }
-
-
-    return [crossX, crossY, radius, startAngle, endAngle, anticlockwise];
+    return [centerX, centerY, radius, startAngle, endAngle, anticlockwise];
   }
   feedPoint(message) {
-    var [crossX, crossY, radius, startAngle, endAngle, anticlockwise] = this._findArc(message.p);
-    if (crossX === null)
+    var params = this._findArc(message.p);
+    if (params === null)
       return this;
-    return new Arc(new Point(crossX, crossY), radius, startAngle, endAngle, anticlockwise);
+    var [centerX, centerY, radius, startAngle, endAngle, anticlockwise] = params;
+    return new Arc(new Point(centerX, centerY), radius, startAngle, endAngle, anticlockwise);
   }
   draw(viewport, context) {
-    var [crossX, crossY, radius, startAngle, endAngle, anticlockwise] = this._findArc(viewport.cursor());
+    var params = this._findArc(viewport.cursor());
     context.beginPath();
-    if (crossX === null) {
+    if (params !== null) {  // arc
+      var [centerX, centerY, radius, startAngle, endAngle, anticlockwise] = params;
       context.arc(
-        crossX.valueOf(),
-        crossY.valueOf(),
+        centerX.valueOf(),
+        centerY.valueOf(),
         radius.valueOf(),
         startAngle.valueOf(),
         endAngle.valueOf(),
