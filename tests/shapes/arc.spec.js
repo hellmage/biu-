@@ -23,7 +23,7 @@ describe("EmptyArc", function() {
       arc.feedText({s: 'c'});
       var next = arc.feedPoint({p: new Point(1, 1)});
       assert.true(next instanceof CenterArc);
-      assert.true(next.p.equals(new Point(1, 1)));
+      assert.true(next.center.equals(new Point(1, 1)));
     });
   });
   describe(".feedText", function() {
@@ -76,11 +76,16 @@ describe("TwoPointArc", function() {
       assert.equal(endAngle.valueOf().toPrecision(3), '2.68');
       assert.false(anticlockwise);
     });
+    it("three points on the same line", function() {
+      var arc = new TwoPointArc(new Point(-1, -1), new Point(1, 3))
+      var params = arc._findArc(new Point(5, 11));
+      assert.isNull(params)
+    });
   });
 });
 
 describe("CenterArc", function() {
-
+  
 });
 
 describe("CenterRadiusArc", function() {
