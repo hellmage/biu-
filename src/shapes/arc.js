@@ -16,9 +16,11 @@ const ArcCmdMap = {
   'c': HowToDrawAnArc.CIRCLE
 };
 
-// given the center of the circle, return the angle of arbitary points on the
-// circle
-function toCircularAngle(cx, cy, x, y) {
+// Given the center of the circle, return the angle of arbitary points on the circle.
+// NOTE: The angle is measured clockwise from the positive x axis and expressed in radians.
+// This is totally the fault of Math.arc. Why in hell does it accept angles in such a weired way?
+// NOTE: This function should be private. It's exposed for the sake of testing.
+export function _toArcAngle(cx, cy, x, y) {
   if (y.eq(cy)) {
     if (x.gte(cx)) {
       return new Fraction(0);
@@ -28,14 +30,14 @@ function toCircularAngle(cx, cy, x, y) {
   }
   if (x.eq(cx)) {
     if (y.gte(cy)) {
-      return new Fraction(Math.PI).div(2);
-    } else {
       return new Fraction(Math.PI).mul(3).div(2);
+    } else {
+      return new Fraction(Math.PI).div(2);
     }
   }
-  var angle = Math.atan2(y.sub(cy).valueOf(), x.sub(cx).valueOf());
-  if (y.lt(cy)) {
-    angle += Math.PI;
+  var angle = -Math.atan2(y.sub(cy).valueOf(), x.sub(cx).valueOf());
+  if (y.gt(cy)) {
+    angle += Math.PI * 2;
   }
   return new Fraction(angle);
 }
@@ -106,22 +108,22 @@ export class TwoPointArc extends PartialArc {
                   .div(y1.sub(y2).mul(x2.sub(x3)).sub(y2.sub(y3).mul(x1.sub(x2))))
                   .div(-2);   // b
     var radius = new Fraction(Math.sqrt(x1.sub(centerX).pow(2).add(y1.sub(centerY).pow(2)).valueOf()));
-    var startAngle = toCircularAngle(centerX, centerY, x1, y1),
-        midAngle = toCircularAngle(centerX, centerY, x2, y2),
-        endAngle = toCircularAngle(centerX, centerY, x3, y3);
+    var startAngle = _toArcAngle(centerX, centerY, x1, y1),
+        midAngle = _toArcAngle(centerX, centerY, x2, y2),
+        endAngle = _toArcAngle(centerX, centerY, x3, y3);
     var anticlockwise = false;
     if (midAngle >= startAngle) {
       if (endAngle >= midAngle || endAngle <= startAngle) {
-        anticlockwise = true;
+        anticlockwise = false;
       }
       else {
-        anticlockwise = false;
+        anticlockwise = true;
       }
     } else {
       if (endAngle >= startAngle || endAngle <= midAngle) {
-        anticlockwise = false;
+        anticlockwise = true;
       } else {
-        anticlockwise = true
+        anticlockwise = false;
       }
     }
     return [centerX, centerY, radius, startAngle, endAngle, anticlockwise];
@@ -157,14 +159,14 @@ export class TwoPointArc extends PartialArc {
 export class CenterArc extends PartialArc {
   constructor(p) {
     super();
-    this.p = p;
+    this.center = p;
   }
   feedPoint(message) {
-    return new TwoPointArc(this.p, message.p);
+    return new CenterRadiusArc(this.center, message.p);
   }
   draw(viewport, context) {
     context.beginPath();
-    context.moveTo(viewport.p2cx(this.p.x), viewport.p2cy(this.p.y));
+    context.moveTo(viewport.p2cx(this.center.x), viewport.p2cy(this.center.y));
     context.lineTo(viewport.cursorX, viewport.cursorY);
     context.stroke();
   }
@@ -178,21 +180,30 @@ export class CenterRadiusArc extends PartialArc {
     this.center = center;
     this.p = p;
     this.radius = new Fraction(Math.sqrt(p.x.sub(center.x).pow(2).add(p.y.sub(center.y).pow(2))));
+    this.anticlockwise = false;
   }
   _findArc(p) {
     var p1 = this.p, p2 = p;
-    var startAngle = Math.atan(p1.y.sub(this.center.y).div(p1.x.sub(this.center.x)).valueOf()),
-        endAngle = Math.atan(p2.y.sub(this.center.y).div(p2.x.sub(this.center.x)).valueOf());
-    var anticlockwise = startAngle > endAngle ? true : false;
-    return [startAngle, endAngle, anticlockwise];
+    var startAngle = _toArcAngle(this.center.x, this.center.y, p1.x, p1.y),
+        endAngle = _toArcAngle(this.center.x, this.center.y, p2.x, p2.y);
+    return [startAngle, endAngle];
   }
   feedPoint(message) {
-    var [startAngle, endAngle, anticlockwise] = this._findArc(message.p);
-    return new Arc(this.center, this.radius, startAngle, endAngle, anticlockwise);
+    var [startAngle, endAngle] = this._findArc(message.p);
+    return new Arc(this.center, this.radius, startAngle, endAngle, this.anticlockwise);
+  }
+  feedText(message) {
+    if (message.s === 'anticlockwise' || message.s === 'acw')
+      this.anticlockwise = true;
+    else if (message.s === 'clockwise' || message.s === 'cw')
+      this.anticlockwise = false;
+    else
+      log.error(`Unrecognized subcommand: ${message.s}`);
+    return this;
   }
   draw(viewport, context) {
     var centerx = viewport.p2cx(this.center.x), centery = viewport.p2cy(this.center.y);
-    var [startAngle, endAngle, anticlockwise] = this._findArc(viewport.cursor());
+    var [startAngle, endAngle] = this._findArc(viewport.cursor());
     context.beginPath();
     context.arc(
       centerx,
@@ -200,17 +211,20 @@ export class CenterRadiusArc extends PartialArc {
       this.radius.valueOf(),
       startAngle.valueOf(),
       endAngle.valueOf(),
-      anticlockwise
+      this.anticlockwise
     )
     context.moveTo(centerx, centery);
     context.lineTo(viewport.p2cx(this.p.x), viewport.p2cy(this.p.y));
-    context.lineTo(viewport.cursorX, viewport.cursorY);
     context.stroke();
   }
 }
 
 export class Arc extends Shape {
   // @param center {Point}
+  // @param radius {Fraction}
+  // @param startAngle {Fraction}
+  // @param endAngle {Fraction}
+  // @param anticlockwise {Boolean}
   constructor(center, radius, startAngle, endAngle, anticlockwise=false) {
     super();
     this.center = center;  // point
