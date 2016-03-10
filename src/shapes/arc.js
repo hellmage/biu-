@@ -141,8 +141,8 @@ export class TwoPointArc extends PartialArc {
     if (params !== null) {  // arc
       var [centerX, centerY, radius, startAngle, endAngle, anticlockwise] = params;
       context.arc(
-        centerX.valueOf(),
-        centerY.valueOf(),
+        viewport.p2cx(centerX),
+        viewport.p2cy(centerY),
         radius.valueOf(),
         startAngle.valueOf(),
         endAngle.valueOf(),
@@ -255,8 +255,8 @@ export class Arc extends Shape {
   draw(viewport, context) {
     context.beginPath();
     context.arc(
-      this.center.x.valueOf(),
-      this.center.y.valueOf(),
+      viewport.p2cx(this.center.x),
+      viewport.p2cy(this.center.y),
       this.radius.valueOf(),
       this.startAngle.valueOf(),
       this.endAngle.valueOf(),

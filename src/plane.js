@@ -1,5 +1,6 @@
 import {Point} from "./shapes/point"
 import {Line, EmptyLine, OnePointLine, FixLengthLine} from "./shapes/line"
+import {EmptyArc} from "./shapes/arc"
 
 export class Plane {
   constructor() {
@@ -11,7 +12,7 @@ export class Plane {
     this.visibleShapes = [];
     // this.drawingShape = new FixLengthLine(new Point(1, 1.5), 500);
     // this.drawingShape = new OnePointLine(new Point(1, 1.5));
-    this.drawingShape = new EmptyLine();
+    this.drawingShape = new EmptyArc();
   }
 
   add(shape) {
