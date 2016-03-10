@@ -47,7 +47,17 @@ class PartialArc extends PartialShape {}
 export class EmptyArc extends PartialArc {
   constructor() {
     super();
+    this._switchToThreePointsMode()
+  }
+  _switchToThreePointsMode() {
     this.howto = HowToDrawAnArc.THREE_POINTS;
+    log.info("Drawing arc by three points, please specify the first point.")
+    log.info('Input "c" to draw the arc by circle.')
+  }
+  _switchToCircleMode() {
+    this.howto = HowToDrawAnArc.CIRCLE;
+    log.info("Drawing arc by circle, please specify the center.")
+    log.info('Input "3p" to draw the arc by three points.')
   }
   feedPoint(message) {
     switch (this.howto) {
@@ -61,11 +71,17 @@ export class EmptyArc extends PartialArc {
     return this;
   }
   feedText(message) {
-    var howto = ArcCmdMap[message.s];
-    if (howto)
-      this.howto = howto;
-    else
-      log.error(`Unrecognized subcommand: ${message.s}`);
+    switch(ArcCmdMap[message.s]) {
+      case HowToDrawAnArc.THREE_POINTS:
+        this._switchToThreePointsMode();
+        break;
+      case HowToDrawAnArc.CIRCLE:
+        this._switchToCircleMode();
+        break;
+      default:
+        log.error(`Unrecognized subcommand: ${message.s}`);
+        break;
+    }
     return this;
   }
   draw(viewport, context) {}
@@ -75,6 +91,7 @@ export class OnePointArc extends PartialArc {
   constructor(p) {
     super();
     this.p = p;
+    log.info("Please specify the second point.")
   }
   feedPoint(message) {
     return new TwoPointArc(this.p, message.p);
@@ -92,6 +109,7 @@ export class TwoPointArc extends PartialArc {
     super();
     this.p1 = p1;
     this.p2 = p2;
+    log.info("Please specify the third point.")
   }
   _findArc(p) {
     var p1 = this.p1, p2 = this.p2, p3 = p;
@@ -160,6 +178,7 @@ export class CenterArc extends PartialArc {
   constructor(p) {
     super();
     this.center = p;
+    log.info("Please specify the radius.")
   }
   feedPoint(message) {
     return new CenterRadiusArc(this.center, message.p);
@@ -181,6 +200,9 @@ export class CenterRadiusArc extends PartialArc {
     this.p = p;
     this.radius = new Fraction(Math.sqrt(p.x.sub(center.x).pow(2).add(p.y.sub(center.y).pow(2))));
     this.anticlockwise = false;
+    log.info("The arc goes clockwise by default.")
+    log.info('Type "anticlockwise" or "acw" to draw it anticlockwise.');
+    log.info('Type "clockwise" or "cw" to switch it back.');
   }
   _findArc(p) {
     var p1 = this.p, p2 = p;
