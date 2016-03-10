@@ -2,8 +2,8 @@ import proxyquire from "proxyquire"
 import sinon from "sinon"
 import {assert} from "../utils/assert"
 import {Fraction} from "../../src/math/fraction"
+import {ShapeType} from "../../src/shapes/shape"
 import {Point} from "../../src/shapes/point"
-import {props} from "../utils/harness"
 
 var lineStub = {
   info: function(message) {
@@ -14,7 +14,7 @@ var arcProxy = proxyquire('../../src/shapes/arc', {
   '../html/logging': lineStub
 })
 
-describe("arcProxy._toArcAngle", function() {
+describe("arc._toArcAngle", function() {
   it("1st dimension", function() {
     var angle = arcProxy._toArcAngle(new Fraction(0), new Fraction(0), new Fraction(2), new Fraction(1));
     assert.equal(angle.valueOf().toPrecision(3), "5.82");
@@ -180,5 +180,14 @@ describe("CenterRadiusArc", function() {
 });
 
 describe("Arc", function() {
-
+  describe(".constructor", function() {
+    it("set type to Arc", function() {
+      var arc = new arcProxy.Arc(new Point(1, 1), 5, 0, Math.PI);
+      assert.equal(arc.type, ShapeType.Arc);
+    });
+  });
+  it(".equals", function() {
+    var arc = new arcProxy.Arc(new Point(1, 1), 5, 0, Math.PI);
+    assert.true(arc.equals(new arcProxy.Arc(new Point(1, 1), 5, 0, Math.PI)));
+  });
 });

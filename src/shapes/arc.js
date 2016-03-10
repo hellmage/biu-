@@ -1,6 +1,6 @@
 import * as log from "../html/logging"
 import {Fraction} from "../math/fraction"
-import {Shape, PartialShape} from "./shape"
+import {Shape, PartialShape, ShapeType} from "./shape"
 import {Point} from "./point"
 
 export const HowToDrawAnArc = {
@@ -254,6 +254,7 @@ export class Arc extends Shape {
     this.startAngle = new Fraction(startAngle);
     this.endAngle = new Fraction(endAngle);
     this.anticlockwise = anticlockwise;
+    this.type = ShapeType.Arc;
   }
 
   // @return {boolean}
