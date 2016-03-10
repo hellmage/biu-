@@ -39,7 +39,13 @@ export class CenterCircle extends PartialCircle {
   draw(viewport, context) {
     var radius = this._radius(viewport.cursor());
     context.beginPath();
-    context.arc(viewport.p2cx(this.center.x), viewport.p2cy(this.center.y), radius, 0, Math.PI * 2);
+    context.arc(
+      viewport.p2cx(this.center.x),
+      viewport.p2cy(this.center.y),
+      radius,
+      0,
+      Math.PI * 2
+    );
     context.stroke();
   }
 }
@@ -59,16 +65,22 @@ export class Circle extends Shape {
   }
 
   toString() {
-    return `c:${this.center},r:${this.radius.valueOf()}`;
+    return `c:${this.center.toString()},r:${this.radius.valueOf()}`;
   }
 
   intersect(viewport) {
-    super.intersect(viewport);
+    return this;
   }
 
   draw(viewport, context) {
     context.beginPath();
-    context.arc(viewport.p2cx(this.center.x), viewport.p2cy(this.center.y), radius, 0, Math.PI * 2);
+    context.arc(
+      viewport.p2cx(this.center.x),
+      viewport.p2cy(this.center.y),
+      this.radius.valueOf(),
+      0,
+      Math.PI * 2
+    );
     context.stroke();
   }
 }
