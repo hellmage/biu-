@@ -14,7 +14,7 @@ export class Plane {
     this.visibleShapes = [];
     // this.drawingShape = new FixLengthLine(new Point(1, 1.5), 500);
     // this.drawingShape = new OnePointLine(new Point(1, 1.5));
-    this.drawingShape = new EmptyPolygon();
+    this.drawingShape = new EmptyArc();
   }
 
   add(shape) {

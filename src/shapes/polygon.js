@@ -46,7 +46,7 @@ export class EmptyPolygon extends PartialPolygon {
       console.assert(nEdge.gt(2) && nEdge.eq(parseInt(message.s)));  // make sure it's integer
       return new EdgePolygon(nEdge);
     } catch(e) {
-      log.error(`Invalid number: ${message.s}`);
+      log.error(`Invalid integer: ${message.s}`);
       return this;
     }
   }
