@@ -1,5 +1,6 @@
 language: node_js
 node_js:
+  - "stable"
   - "5"
   - "5.1"
   - "4"
@@ -12,3 +13,5 @@ node_js:
   - "0.8"
   - "0.6"
   - "iojs"
+before_install:
+  - npm install -g mocha
