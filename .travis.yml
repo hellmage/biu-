@@ -1,4 +1,12 @@
+sudo: false
 language: node_js
 node_js:
-  - "5.4.1"
-script: npm test
+  - "stable"
+  - "5"
+  - "4"
+  - "0.10"
+  - "0.8"
+script: "npm test"
+notifications:
+  email:
+    - 2304310@qq.com
