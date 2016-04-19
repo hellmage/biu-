@@ -11,7 +11,7 @@ export class Point extends Shape {
 
   equals(p) {
     super.equals(p);
-    return p.x.equals(this.x) && p.y.equals(this.y);
+    return p.x.eq(this.x) && p.y.eq(this.y);
   }
 
   toString() {
