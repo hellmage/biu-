@@ -1,5 +1,4 @@
-var path = require('path');
-var glob = require("glob");
+var path = require('path')
 
 module.exports = {
   module: {
@@ -7,7 +6,7 @@ module.exports = {
       {
         test: /\.js$/,
         exclude: /node_modules/,
-        loader: "babel-loader"
+        loader: 'babel-loader'
       }
     ]
   },
@@ -16,5 +15,5 @@ module.exports = {
     path: path.resolve(__dirname, 'built'),
     filename: 'bundle.js'
   },
-  devtool: "#inline-source-map"
+  devtool: '#inline-source-map'
 }

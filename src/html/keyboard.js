@@ -1,55 +1,55 @@
-import * as WormHole from "./wormhole"
+import * as WormHole from './wormhole'
 
-function commandConsumer(evt) {
-  var moveAction = null;
+function commandConsumer (evt) {
+  var moveAction = null
   switch (evt.keyCode) {
-    case '37':  // left
+    case '37': // left
     case 37:
-      moveAction = "left";
+      moveAction = 'left'
       autocat.move(moveAction)
-      break;
-    case '39':  // right
+      break
+    case '39': // right
     case 39:
-      moveAction = "right";
+      moveAction = 'right'
       autocat.move(moveAction)
-      break;
-    case '38':  // up
+      break
+    case '38': // up
     case 38:
-      moveAction = "up";
+      moveAction = 'up'
       autocat.move(moveAction)
-      break;
-    case '40':  // down
+      break
+    case '40': // down
     case 40:
-      moveAction = "down";
+      moveAction = 'down'
       autocat.move(moveAction)
-      break;
+      break
     default:
-      break;
+      break
   }
   switch (evt.charCode) {
-    case '43':  // +
+    case '43': // +
     case 43:
-      autocat.zoomin();
-      break;
-    case '45':  // -
+      autocat.zoomin()
+      break
+    case '45': // -
     case 45:
-      autocat.zoomout();
-      break;
+      autocat.zoomout()
+      break
     default:
-      break;
+      break
   }
   switch (String.fromCharCode(evt.which)) {
     case 'l':
-      break;
+      break
     default:
 
   }
 }
 
-export function init() {
-  document.addEventListener("keypress", function(evt) {
-    var message = "keypressed : " + evt.which + ', ' + String.fromCharCode(evt.which) + ', ' + evt.metaKey + ', ' + evt.keyCode + ', ' + evt.charCode;
-    console.log(message);
+export function init () {
+  document.addEventListener('keypress', function (evt) {
+    var message = 'keypressed : ' + evt.which + ', ' + String.fromCharCode(evt.which) + ', ' + evt.metaKey + ', ' + evt.keyCode + ', ' + evt.charCode
+    console.log(message)
     if (evt.target.id !== 'user-input')
       WormHole.emit(WormHole.Channels.AUTOCAT, {
         type: WormHole.UserInputType.G,
@@ -57,7 +57,7 @@ export function init() {
           code: evt.which,
           meta: ''
         }
-      });
-    commandConsumer(evt);
-  });
+      })
+    commandConsumer(evt)
+  })
 }

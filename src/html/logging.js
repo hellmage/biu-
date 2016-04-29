@@ -1,37 +1,37 @@
-const LogCountMax = 500;
+const LogCountMax = 500
 
-const Level = {  // Enum
+const Level = { // Enum
   INFO: 'info',
   WARN: 'warn',
   ERROR: 'error',
   CRITICAL: 'critical',
   DEBUG: 'debug'
-};
-
-export function info(message) {
-  log(Level.INFO, message);
 }
 
-export function warn(message) {
-  log(Level.WARN, message);
+export function info (message) {
+  log(Level.INFO, message)
 }
 
-export function critical(message) {
-  log(Level.CRITICAL, message);
+export function warn (message) {
+  log(Level.WARN, message)
 }
 
-export function error(message) {
-  log(Level.ERROR, message);
+export function critical (message) {
+  log(Level.CRITICAL, message)
 }
 
-export function debug(message) {
-  log(Level.DEBUG, message);
+export function error (message) {
+  log(Level.ERROR, message)
 }
 
-function log(level, message) {
-  var container = document.getElementById("logs");
+export function debug (message) {
+  log(Level.DEBUG, message)
+}
+
+function log (level, message) {
+  var container = document.getElementById('logs')
   if (container.children.length >= LogCountMax)
-    container.removeChild(container.childNodes[0]);
-  container.innerHTML += `<p>[<span style='font-color:black'>${level.toUpperCase()}</span>]${message}</p>`;
-  container.scrollTop = container.scrollHeight;
+    container.removeChild(container.childNodes[0])
+  container.innerHTML += `<p>[<span style='font-color:black'>${level.toUpperCase()}</span>]${message}</p>`
+  container.scrollTop = container.scrollHeight
 }

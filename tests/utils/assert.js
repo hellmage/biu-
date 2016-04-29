@@ -1,13 +1,13 @@
-import * as _assert from "assert"
+import * as _assert from 'assert'
 
 export var assert = Object.assign(_assert, {
-  'true': function(predicate, message="") {
-    return _assert.equal(predicate, true, message);
+  'true': function (predicate, message = '') {
+    return _assert.equal(predicate, true, message)
   },
-  'false': function(predicate, message="") {
-    return _assert.equal(predicate, false, message);
+  'false': function (predicate, message = '') {
+    return _assert.equal(predicate, false, message)
   },
-  'isNull': function(predicate, message="") {
-    return _assert.equal(predicate, null, message);
+  'isNull': function (predicate, message = '') {
+    return _assert.equal(predicate, null, message)
   }
-});
+})

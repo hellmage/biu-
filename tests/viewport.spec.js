@@ -1,97 +1,97 @@
-import {Fraction} from "../src/math/fraction"
-import {Direction, ViewPort} from "../src/viewport"
-import {Point} from "../src/shapes/point"
-import {assert} from "./utils/assert"
+import { Fraction } from '../src/math/fraction'
+import { Direction, ViewPort } from '../src/viewport'
+import { Point } from '../src/shapes/point'
+import { assert } from './utils/assert'
 
-describe("ViewPort", function() {
-  describe("constructor", function() {
-    it("set origin of the plane at its center, zoomFactor defaults to 1", function() {
-      var vp = new ViewPort(1405, 704);
-      assert.true(vp.cWidth.eq(1405));
-      assert.true(vp.cHeight.eq(704));
-      assert.true(vp.pWidth.eq(1405));
-      assert.true(vp.pHeight.eq(704));
-      assert.true(vp.pLeftTop.equals(new Point(-702.5, 352)));
-    });
-    it("zoom on construction", function() {
-      var vp = new ViewPort(1405, 704, 0.5);
-      assert.true(vp.pWidth.eq(702.5));
-      assert.true(vp.pHeight.eq(352));
-      assert.true(vp.pLeftTop.equals(new Point(-351.25, 176)));
-    });
-  });
-  describe(".zoom", function() {
-    it("zoom in", function() {
-      var vp = new ViewPort(1405, 704);
-      vp.zoom(-0.7);
-      assert.true(vp.cWidth.eq(1405));
-      assert.true(vp.cHeight.eq(704));
-      assert.true(vp.pWidth.eq(421.5));
-      assert.true(vp.pHeight.eq(211.2));
-      assert.true(vp.pLeftTop.equals(new Point(-210.75, 105.6)));
-    });
-    it("zoom out", function() {
-      var vp = new ViewPort(1405, 704);
-      vp.zoom(4);
-      assert.true(vp.cWidth.eq(1405));
-      assert.true(vp.cHeight.eq(704));
-      assert.true(vp.pWidth.eq(7025));
-      assert.true(vp.pHeight.eq(3520));
-      assert.true(vp.pLeftTop.equals(new Point(-3512.5, 1760)));
-    });
-  });
-  describe(".move", function() {
-    it("up, delta = 10%", function() {
-      var vp = new ViewPort(1405, 704);
-      vp.move(Direction.UP, 0.1);
-      assert.true(vp.cWidth.eq(1405));
-      assert.true(vp.cHeight.eq(704));
-      assert.true(vp.pWidth.eq(1405));
-      assert.true(vp.pHeight.eq(704));
-      assert.true(vp.pLeftTop.equals(new Point(-702.5, 422.4)));
-    });
-    it("down", function() {
-      var vp = new ViewPort(1405, 704);
-      vp.move(Direction.DOWN, 0.2);
-      assert.true(vp.pLeftTop.equals(new Point(-702.5, 211.2)));
-    });
-    it("left", function() {
-      var vp = new ViewPort(1405, 704);
-      vp.move(Direction.LEFT, 0.2);
-      assert.true(vp.pLeftTop.equals(new Point(-983.5, 352)));
-    });
-    it("right", function() {
-      var vp = new ViewPort(1405, 704);
-      vp.move(Direction.RIGHT, 0.2);
-      assert.true(vp.pLeftTop.equals(new Point(-421.5, 352)));
-    });
-  });
-  it(".p2cx", function() {
-    var vp = new ViewPort(1405, 704, 0.1);
-    vp.move(Direction.UP, 0.2);
-    vp.move(Direction.LEFT, 0.5);
-    var cx = vp.p2cx(new Fraction(14.22));
-    assert.equal(cx, 1547.2);
-  });
-  it(".p2cy", function() {
-    var vp = new ViewPort(1405, 704, 0.1);
-    vp.move(Direction.UP, 0.2);
-    vp.move(Direction.LEFT, 0.5);
-    var cy = vp.p2cy(new Fraction(21.12));
-    assert.equal(cy, 281.6);
-  });
-  it(".c2px", function() {
-    var vp = new ViewPort(1405, 704, 0.1);
-    vp.move(Direction.UP, 0.2);
-    vp.move(Direction.LEFT, 0.5);
-    var px = vp.c2px(992);
-    assert.equal(px, -41.3);
-  });
-  it(".c2py", function() {
-    var vp = new ViewPort(1405, 704, 0.1);
-    vp.move(Direction.UP, 0.2);
-    vp.move(Direction.LEFT, 0.5);
-    var py = vp.c2py(308);
-    assert.equal(py, 18.48);
-  });
-});
+describe('ViewPort', function () {
+  describe('constructor', function () {
+    it('set origin of the plane at its center, zoomFactor defaults to 1', function () {
+      var vp = new ViewPort(1405, 704)
+      assert.true(vp.cWidth.eq(1405))
+      assert.true(vp.cHeight.eq(704))
+      assert.true(vp.pWidth.eq(1405))
+      assert.true(vp.pHeight.eq(704))
+      assert.true(vp.pLeftTop.equals(new Point(-702.5, 352)))
+    })
+    it('zoom on construction', function () {
+      var vp = new ViewPort(1405, 704, 0.5)
+      assert.true(vp.pWidth.eq(702.5))
+      assert.true(vp.pHeight.eq(352))
+      assert.true(vp.pLeftTop.equals(new Point(-351.25, 176)))
+    })
+  })
+  describe('.zoom', function () {
+    it('zoom in', function () {
+      var vp = new ViewPort(1405, 704)
+      vp.zoom(-0.7)
+      assert.true(vp.cWidth.eq(1405))
+      assert.true(vp.cHeight.eq(704))
+      assert.true(vp.pWidth.eq(421.5))
+      assert.true(vp.pHeight.eq(211.2))
+      assert.true(vp.pLeftTop.equals(new Point(-210.75, 105.6)))
+    })
+    it('zoom out', function () {
+      var vp = new ViewPort(1405, 704)
+      vp.zoom(4)
+      assert.true(vp.cWidth.eq(1405))
+      assert.true(vp.cHeight.eq(704))
+      assert.true(vp.pWidth.eq(7025))
+      assert.true(vp.pHeight.eq(3520))
+      assert.true(vp.pLeftTop.equals(new Point(-3512.5, 1760)))
+    })
+  })
+  describe('.move', function () {
+    it('up, delta = 10%', function () {
+      var vp = new ViewPort(1405, 704)
+      vp.move(Direction.UP, 0.1)
+      assert.true(vp.cWidth.eq(1405))
+      assert.true(vp.cHeight.eq(704))
+      assert.true(vp.pWidth.eq(1405))
+      assert.true(vp.pHeight.eq(704))
+      assert.true(vp.pLeftTop.equals(new Point(-702.5, 422.4)))
+    })
+    it('down', function () {
+      var vp = new ViewPort(1405, 704)
+      vp.move(Direction.DOWN, 0.2)
+      assert.true(vp.pLeftTop.equals(new Point(-702.5, 211.2)))
+    })
+    it('left', function () {
+      var vp = new ViewPort(1405, 704)
+      vp.move(Direction.LEFT, 0.2)
+      assert.true(vp.pLeftTop.equals(new Point(-983.5, 352)))
+    })
+    it('right', function () {
+      var vp = new ViewPort(1405, 704)
+      vp.move(Direction.RIGHT, 0.2)
+      assert.true(vp.pLeftTop.equals(new Point(-421.5, 352)))
+    })
+  })
+  it('.p2cx', function () {
+    var vp = new ViewPort(1405, 704, 0.1)
+    vp.move(Direction.UP, 0.2)
+    vp.move(Direction.LEFT, 0.5)
+    var cx = vp.p2cx(new Fraction(14.22))
+    assert.equal(cx, 1547.2)
+  })
+  it('.p2cy', function () {
+    var vp = new ViewPort(1405, 704, 0.1)
+    vp.move(Direction.UP, 0.2)
+    vp.move(Direction.LEFT, 0.5)
+    var cy = vp.p2cy(new Fraction(21.12))
+    assert.equal(cy, 281.6)
+  })
+  it('.c2px', function () {
+    var vp = new ViewPort(1405, 704, 0.1)
+    vp.move(Direction.UP, 0.2)
+    vp.move(Direction.LEFT, 0.5)
+    var px = vp.c2px(992)
+    assert.equal(px, -41.3)
+  })
+  it('.c2py', function () {
+    var vp = new ViewPort(1405, 704, 0.1)
+    vp.move(Direction.UP, 0.2)
+    vp.move(Direction.LEFT, 0.5)
+    var py = vp.c2py(308)
+    assert.equal(py, 18.48)
+  })
+})
