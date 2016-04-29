@@ -1,5 +1,5 @@
 import { assert } from '../utils/assert'
-import { StateMachine } from '../../src/math/state-machine'
+import { StateMachine, MachineNotBeginError } from '../../src/math/state-machine'
 
 describe('StateMachine', function () {
   it('happy path', function () {
@@ -70,7 +70,7 @@ describe('StateMachine', function () {
           .state('b', {ending: true})
           .event('run', 'a', 'b')
         sm.next('run')
-      }, /not begin/)
+      }, MachineNotBeginError)
     })
     it('fails for unknown event', function () {
       var sm = new StateMachine()
@@ -89,7 +89,7 @@ describe('StateMachine', function () {
           .state('b', {ending: true})
           .event('run', 'a', 'b')
         sm.current()
-      }, /not begin/)
+      }, MachineNotBeginError)
     })
   })
 })

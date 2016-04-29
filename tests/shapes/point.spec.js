@@ -1,6 +1,6 @@
 import { assert } from '../utils/assert'
 import { Fraction } from '../../src/math/fraction'
-import { ShapeType } from '../../src/shapes/shape'
+import { ShapeType, NotAShapeError, ShapeTypeMismatchError } from '../../src/shapes/shape'
 import { Point } from '../../src/shapes/point'
 import { ViewPort } from '../../src/viewport'
 
@@ -43,10 +43,10 @@ describe('Point', function () {
       var p1 = new Point(5, 5)
       assert.throws(function () {
         p1.equals({a: 1})
-      }, /Not a shape/)
+      }, NotAShapeError)
       assert.throws(function () {
         p1.equals({type: 'unknown'})
-      }, /mismatch/)
+      }, ShapeTypeMismatchError)
     })
   })
   it('.toString', function () {

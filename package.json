@@ -39,5 +39,10 @@
       "es2015"
     ]
   },
-  "homepage": "https://github.com/hellmage/biu-#readme"
+  "homepage": "https://github.com/hellmage/biu-#readme",
+  "standard": {
+    "ignore": [
+      "src/html/*.js"
+    ]
+  }
 }

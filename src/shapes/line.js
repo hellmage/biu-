@@ -3,14 +3,16 @@ import { Fraction } from '../math/fraction'
 import { PartialShape, Shape, ShapeType } from './shape'
 import { Point } from './point'
 import { degrees2radians } from './utils'
+import { NotImplementedError } from '../errors'
 
 function extractCmdArg (input) {
-  var str = input.split(' ').filter(s => s != '')
-  var cmd = str.shift(), arg = str.join(' ')
+  var str = input.split(' ').filter((s) => s !== '')
+  var cmd = str.shift()
+  var arg = str.join(' ')
   try {
     arg = new Fraction(arg)
     return [cmd, arg]
-  } catch(e) {
+  } catch (e) {
     log.error(`Invalid argument: ${input}`)
     return [cmd, null]
   }
@@ -19,7 +21,7 @@ function extractCmdArg (input) {
 class PartialLine extends PartialShape {
   // @returns [destX, destY] [{number}, {number}] on canvas
   _drawTo (viewport) {
-    throw 'NotImplemented'
+    throw new NotImplementedError()
   }
   draw (viewport, context) {
     var [destX, destY] = this._drawTo(viewport)
@@ -57,10 +59,11 @@ export class OnePointLine extends PartialLine {
       return this
     }
     var next = this
-    if (cmd === 'l') // here length refers to distance on the plane
+    if (cmd === 'l') {  // here length refers to distance on the plane
       next = new FixLengthLine(this.p, arg)
-    else
+    } else {
       log.error(`Unrecognized subcommand: ${cmd}`)
+    }
     return next
   }
 }
@@ -76,21 +79,22 @@ export class FixLengthLine extends PartialLine {
 
   // given a point on the plane(usually a click), return the ending point of fix-length line
   _dest (px, py) {
-    var dx = px.sub(this.p.x), dy = py.sub(this.p.y)
+    var dx = px.sub(this.p.x)
+    var dy = py.sub(this.p.y)
     if (dx.eq(0)) {
       var length = dy.gt(0) ? this.length : -this.length
       return [this.p.x, this.p.y.add(length)]
     } else {
       var dist = Math.sqrt(dx.pow(2).add(dy.pow(2)).valueOf())
-      var destX = this.p.x.add(dx.div(dist).mul(this.length)),
-        destY = this.p.y.add(dy.div(dist).mul(this.length))
+      var destX = this.p.x.add(dx.div(dist).mul(this.length))
+      var destY = this.p.y.add(dy.div(dist).mul(this.length))
       return [destX, destY]
     }
   }
 
   _drawTo (viewport) {
-    var cursorX = viewport.c2px(viewport.cursorX),
-      cursorY = viewport.c2py(viewport.cursorY)
+    var cursorX = viewport.c2px(viewport.cursorX)
+    var cursorY = viewport.c2py(viewport.cursorY)
     var [destX, destY] = this._dest(cursorX, cursorY)
     return [viewport.p2cx(destX), viewport.p2cy(destY)]
   }
@@ -108,8 +112,8 @@ export class FixLengthLine extends PartialLine {
     var next = this
     if (cmd === 'a') {
       var angle = degrees2radians(arg).valueOf()
-      var destX = this.p.x.add(this.length.mul(Math.cos(angle))),
-        destY = this.p.y.add(this.length.mul(Math.sin(angle)))
+      var destX = this.p.x.add(this.length.mul(Math.cos(angle)))
+      var destY = this.p.y.add(this.length.mul(Math.sin(angle)))
       next = new Line(this.p, new Point(destX, destY))
     } else {
       log.error(`Unrecognized subcommand: ${cmd}`)
@@ -148,35 +152,39 @@ export class Line extends Shape {
     // @param p: Point
     // @return number
     function region (p) {
-      if (p.x.lte(vp.pLeftTop.x) && p.y.gte(vp.pLeftTop.y))
+      if (p.x.lte(vp.pLeftTop.x) && p.y.gte(vp.pLeftTop.y)) {
         return 9 // 1001
-      else if (p.x.lte(vp.pLeftTop.x)
-        && p.y.lt(vp.pLeftTop.y) && p.y.gte(vp.pLeftTop.y.sub(vp.pHeight)))
+      } else if (p.x.lte(vp.pLeftTop.x) &&
+          p.y.lt(vp.pLeftTop.y) &&
+          p.y.gte(vp.pLeftTop.y.sub(vp.pHeight))) {
         return 1 // 0001
-      else if (p.x.lte(vp.pLeftTop.x) && p.y.lt(vp.pLeftTop.y.sub(vp.pHeight)))
+      } else if (p.x.lte(vp.pLeftTop.x) && p.y.lt(vp.pLeftTop.y.sub(vp.pHeight))) {
         return 5 // 0101
-      else if (p.x.gt(vp.pLeftTop.x) && p.x.lte(vp.pLeftTop.x.add(vp.pWidth))
-        && p.y.lte(vp.pLeftTop.y.sub(vp.pHeight)))
+      } else if (p.x.gt(vp.pLeftTop.x) && p.x.lte(vp.pLeftTop.x.add(vp.pWidth)) &&
+          p.y.lte(vp.pLeftTop.y.sub(vp.pHeight))) {
         return 4 // 0100
-      else if (p.x.gt(vp.pLeftTop.x.add(vp.pWidth)) && p.y.lte(vp.pLeftTop.y.sub(vp.pHeight)))
+      } else if (p.x.gt(vp.pLeftTop.x.add(vp.pWidth)) && p.y.lte(vp.pLeftTop.y.sub(vp.pHeight))) {
         return 6 // 0110
-      else if (p.x.gte(vp.pLeftTop.x.add(vp.pWidth))
-        && p.y.lt(vp.pLeftTop.y) && p.y.gte(vp.pLeftTop.y.sub(vp.pHeight)))
+      } else if (p.x.gte(vp.pLeftTop.x.add(vp.pWidth)) &&
+          p.y.lt(vp.pLeftTop.y) && p.y.gte(vp.pLeftTop.y.sub(vp.pHeight))) {
         return 2 // 0010
-      else if (p.x.gte(vp.pLeftTop.x.add(vp.pWidth)) && p.y.gte(vp.pLeftTop.y))
+      } else if (p.x.gte(vp.pLeftTop.x.add(vp.pWidth)) && p.y.gte(vp.pLeftTop.y)) {
         return 10 // 1010
-      else if (p.x.gt(vp.pLeftTop.x) && p.x.lte(vp.pLeftTop.x.add(vp.pWidth))
-        && p.y.gte(vp.pLeftTop.y))
+      } else if (p.x.gt(vp.pLeftTop.x) && p.x.lte(vp.pLeftTop.x.add(vp.pWidth)) &&
+          p.y.gte(vp.pLeftTop.y)) {
         return 8 // 1000
-      else
+      } else {
         return 0 // 0000
+      }
     }
 
-    var r1 = region(this.p1), r2 = region(this.p2)
-    if ((r1 | r2) === 0) // Both endpoints are in the viewport region, accept
+    var r1 = region(this.p1)
+    var r2 = region(this.p2)
+    if ((r1 | r2) === 0) {  // Both endpoints are in the viewport region, accept
       return true
-    else if ((r1 & r2) !== 0) // reject
+    } else if ((r1 & r2) !== 0) {  // reject
       return false
+    }
     return null
   }
 
@@ -184,17 +192,26 @@ export class Line extends Shape {
   // @param vp: ViewPort
   // @return Line?
   _clipLiangBarsky (vp) {
-    var dx = this.p2.x.sub(this.p1.x), dy = this.p2.y.sub(this.p1.y)
-    var xWinMin = vp.pLeftTop.x, xWinMax = vp.pLeftTop.x.add(vp.pWidth)
-    var yWinMin = vp.pLeftTop.y.sub(vp.pHeight), yWinMax = vp.pLeftTop.y
-    var p1 = dx.neg(), q1 = this.p1.x.sub(xWinMin),
-      p2 = dx, q2 = xWinMax.sub(this.p1.x),
-      p3 = dy.neg(), q3 = this.p1.y.sub(yWinMin),
-      p4 = dy, q4 = yWinMax.sub(this.p1.y)
+    var dx = this.p2.x.sub(this.p1.x)
+    var dy = this.p2.y.sub(this.p1.y)
+    var xWinMin = vp.pLeftTop.x
+    var xWinMax = vp.pLeftTop.x.add(vp.pWidth)
+    var yWinMin = vp.pLeftTop.y.sub(vp.pHeight)
+    var yWinMax = vp.pLeftTop.y
+    var p1 = dx.neg()
+    var q1 = this.p1.x.sub(xWinMin)
+    var p2 = dx
+    var q2 = xWinMax.sub(this.p1.x)
+    var p3 = dy.neg()
+    var q3 = this.p1.y.sub(yWinMin)
+    var p4 = dy
+    var q4 = yWinMax.sub(this.p1.y)
     if ((dx.equals(0) && (q1.lte(0) || q2.lte(0))) ||
-      (dy.equals(0) && (q3.lte(0) || q4.lte(0))))
+        (dy.equals(0) && (q3.lte(0) || q4.lte(0)))) {
       return null // parallel and outside of window
-    var t1 = new Fraction(0), t2 = new Fraction(1)
+    }
+    var t1 = new Fraction(0)
+    var t2 = new Fraction(1)
     if (dx.gt(0)) {
       t1 = q1.div(p1).max(0)
       t2 = q2.div(p2).min(1)
@@ -209,11 +226,14 @@ export class Line extends Shape {
       t1 = q4.div(p4).max(t1)
       t2 = q3.div(p3).min(t2)
     }
-    var newP1 = this.p1, newP2 = this.p2
-    if (t1.ne(0))
+    var newP1 = this.p1
+    var newP2 = this.p2
+    if (t1.ne(0)) {
       newP1 = new Point(this.p1.x.add(t1.mul(dx)), this.p1.y.add(t1.mul(dy)))
-    if (t2.ne(1))
+    }
+    if (t2.ne(1)) {
       newP2 = new Point(this.p1.x.add(t2.mul(dx)), this.p1.y.add(t2.mul(dy)))
+    }
     return new Line(newP1, newP2)
   }
 
@@ -226,12 +246,13 @@ export class Line extends Shape {
       - else, return null
    */
   intersect (vp) {
-    if (this._bCohenSutherland(vp) === true)
+    if (this._bCohenSutherland(vp) === true) {
       return this
-    else if (this._bCohenSutherland(vp) === false)
+    } else if (this._bCohenSutherland(vp) === false) {
       return null
-    else
+    } else {
       return this._clipLiangBarsky(vp)
+    }
   }
 
   draw (viewport, context) {

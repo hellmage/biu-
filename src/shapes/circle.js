@@ -32,7 +32,7 @@ export class CenterCircle extends PartialCircle {
     try {
       var radius = new Fraction(message.s)
       return new Circle(this.center, radius)
-    } catch(e) {
+    } catch (e) {
       log.error(`Invalid number: ${message.s}`)
       return this
     }

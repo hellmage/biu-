@@ -2,6 +2,7 @@ import * as log from '../html/logging'
 import { Fraction } from '../math/fraction'
 import { Shape, PartialShape, ShapeType } from './shape'
 import { Point } from './point'
+import { InvalidCommandError } from '../errors'
 
 export const HowToDrawAnArc = {
   // define an arc by three points on the arc
@@ -67,9 +68,8 @@ export class EmptyArc extends PartialArc {
       case HowToDrawAnArc.CIRCLE:
         return new CenterArc(message.p)
       default:
-        throw `Invalid way to draw an arc: ${this.howto}`
+        throw new InvalidCommandError(`Invalid way to draw an arc: ${this.howto}`)
     }
-    return this
   }
   feedText (message) {
     switch (ArcCmdMap[message.s]) {
@@ -113,23 +113,36 @@ export class TwoPointArc extends PartialArc {
     log.info('Please specify the third point.')
   }
   _findArc (p) {
-    var p1 = this.p1, p2 = this.p2, p3 = p
-    var x1 = p1.x, y1 = p1.y, x2 = p2.x, y2 = p2.y, x3 = p3.x, y3 = p3.y
-    var dx21 = x2.sub(x1), dy21 = y2.sub(y1), dx32 = x3.sub(x2), dy32 = y3.sub(y2)
-    if (dx21.mul(dy32).eq(dx32.mul(dy21)))
+    var p1 = this.p1
+    var p2 = this.p2
+    var p3 = p
+    var x1 = p1.x
+    var y1 = p1.y
+    var x2 = p2.x
+    var y2 = p2.y
+    var x3 = p3.x
+    var y3 = p3.y
+    var dx21 = x2.sub(x1)
+    var dy21 = y2.sub(y1)
+    var dx32 = x3.sub(x2)
+    var dy32 = y3.sub(y2)
+    if (dx21.mul(dy32).eq(dx32.mul(dy21))) {
       return null // the three points are on the same line
+    }
     // (x-a)^2+(y-b)^2=0
-    var z1 = x1.pow(2).add(y1.pow(2)), z2 = x2.pow(2).add(y2.pow(2)), z3 = x3.pow(2).add(y3.pow(2))
+    var z1 = x1.pow(2).add(y1.pow(2))
+    var z2 = x2.pow(2).add(y2.pow(2))
+    var z3 = x3.pow(2).add(y3.pow(2))
     var centerX = y1.sub(y2).mul(z3.sub(z2)).sub(y2.sub(y3).mul(z2.sub(z1)))
         .div(y1.sub(y2).mul(x2.sub(x3)).sub(y2.sub(y3).mul(x1.sub(x2))))
-        .div(-2), // a
-      centerY = z2.sub(z1).mul(x2.sub(x3)).sub(z3.sub(z2).mul(x1.sub(x2)))
+        .div(-2)  // a
+    var centerY = z2.sub(z1).mul(x2.sub(x3)).sub(z3.sub(z2).mul(x1.sub(x2)))
         .div(y1.sub(y2).mul(x2.sub(x3)).sub(y2.sub(y3).mul(x1.sub(x2))))
         .div(-2) // b
     var radius = new Fraction(Math.sqrt(x1.sub(centerX).pow(2).add(y1.sub(centerY).pow(2)).valueOf()))
-    var startAngle = _toArcAngle(centerX, centerY, x1, y1),
-      midAngle = _toArcAngle(centerX, centerY, x2, y2),
-      endAngle = _toArcAngle(centerX, centerY, x3, y3)
+    var startAngle = _toArcAngle(centerX, centerY, x1, y1)
+    var midAngle = _toArcAngle(centerX, centerY, x2, y2)
+    var endAngle = _toArcAngle(centerX, centerY, x3, y3)
     var anticlockwise = false
     if (midAngle >= startAngle) {
       if (endAngle >= midAngle || endAngle <= startAngle) {
@@ -148,8 +161,9 @@ export class TwoPointArc extends PartialArc {
   }
   feedPoint (message) {
     var params = this._findArc(message.p)
-    if (params === null)
+    if (params === null) {
       return this
+    }
     var [centerX, centerY, radius, startAngle, endAngle, anticlockwise] = params
     return new Arc(new Point(centerX, centerY), radius, startAngle, endAngle, anticlockwise)
   }
@@ -205,9 +219,10 @@ export class CenterRadiusArc extends PartialArc {
     log.info('Type "clockwise" or "cw" to switch it back.')
   }
   _findArc (p) {
-    var p1 = this.p, p2 = p
-    var startAngle = _toArcAngle(this.center.x, this.center.y, p1.x, p1.y),
-      endAngle = _toArcAngle(this.center.x, this.center.y, p2.x, p2.y)
+    var p1 = this.p
+    var p2 = p
+    var startAngle = _toArcAngle(this.center.x, this.center.y, p1.x, p1.y)
+    var endAngle = _toArcAngle(this.center.x, this.center.y, p2.x, p2.y)
     return [startAngle, endAngle]
   }
   feedPoint (message) {
@@ -215,16 +230,18 @@ export class CenterRadiusArc extends PartialArc {
     return new Arc(this.center, this.radius, startAngle, endAngle, this.anticlockwise)
   }
   feedText (message) {
-    if (message.s === 'anticlockwise' || message.s === 'acw')
+    if (message.s === 'anticlockwise' || message.s === 'acw') {
       this.anticlockwise = true
-    else if (message.s === 'clockwise' || message.s === 'cw')
+    } else if (message.s === 'clockwise' || message.s === 'cw') {
       this.anticlockwise = false
-    else
+    } else {
       log.error(`Unrecognized subcommand: ${message.s}`)
+    }
     return this
   }
   draw (viewport, context) {
-    var centerx = viewport.p2cx(this.center.x), centery = viewport.p2cy(this.center.y)
+    var centerx = viewport.p2cx(this.center.x)
+    var centery = viewport.p2cy(this.center.y)
     var [startAngle, endAngle] = this._findArc(viewport.cursor())
     context.beginPath()
     context.arc(
@@ -260,11 +277,11 @@ export class Arc extends Shape {
   // @return {boolean}
   equals (arc) {
     super.equals(arc)
-    return this.center.equals(arc.center)
-    && this.radius.eq(arc.radius)
-    && this.startAngle.eq(arc.startAngle)
-    && this.endAngle.eq(arc.endAngle)
-    && this.anticlockwise === arc.anticlockwise
+    return this.center.equals(arc.center) &&
+      this.radius.eq(arc.radius) &&
+      this.startAngle.eq(arc.startAngle) &&
+      this.endAngle.eq(arc.endAngle) &&
+      this.anticlockwise === arc.anticlockwise
   }
 
   toString () {

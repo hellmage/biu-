@@ -36,7 +36,7 @@ Object.assign(_Fraction.default, {
     var f = NaN
     try {
       f = new Fraction(str)
-    } catch(e) {
+    } catch (e) {
       // pass
     }
     return f

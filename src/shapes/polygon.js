@@ -1,6 +1,6 @@
 import * as log from '../html/logging'
 import { Fraction } from '../math/fraction'
-import { Shape, PartialShape, ShapeType } from './shape'
+import { Shape, PartialShape } from './shape'
 
 function _draw (viewport, context, center, radius, start, nEdge) {
   if (radius <= 1) {
@@ -20,9 +20,9 @@ function _draw (viewport, context, center, radius, start, nEdge) {
     }
     context.beginPath()
     context.moveTo(viewport.p2cx(start.x), viewport.p2cy(start.y))
-    for (var i = 0; i < angles.length; i++) {
-      var dy = radius * Math.sin(angles[i].valueOf()),
-        dx = radius * Math.cos(angles[i].valueOf())
+    for (var j = 0; j < angles.length; j++) {
+      var dy = radius * Math.sin(angles[j].valueOf())
+      var dx = radius * Math.cos(angles[j].valueOf())
       context.lineTo(
         viewport.p2cx(center.x.add(dx)),
         viewport.p2cy(center.y.add(dy))
@@ -44,9 +44,9 @@ export class EmptyPolygon extends PartialPolygon {
   feedText (message) {
     try {
       var nEdge = new Fraction(message.s)
-      console.assert(nEdge.gt(2) && nEdge.eq(parseInt(message.s))); // make sure it's integer
+      console.assert(nEdge.gt(2) && nEdge.eq(parseInt(message.s))) // make sure it's integer
       return new EdgePolygon(nEdge)
-    } catch(e) {
+    } catch (e) {
       log.error(`Invalid integer: ${message.s}`)
       return this
     }
@@ -98,9 +98,9 @@ export class Polygon extends Shape {
   }
   equals (polygon) {
     super.equals(polygon)
-    return this.center.equals(polygon.center)
-    && this.radius.eq(polygon.radius)
-    && this.start.equals(polygon.start)
+    return this.center.equals(polygon.center) &&
+      this.radius.eq(polygon.radius) &&
+      this.start.equals(polygon.start)
   }
   toString () {
     return `c:${this.center},r:${this.radius.valueOf()},s:${this.start}`

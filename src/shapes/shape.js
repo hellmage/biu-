@@ -1,4 +1,9 @@
 import { UserInputType } from '../html/wormhole'
+import { NotImplementedError } from '../errors'
+
+class NotAShapeError extends Error {}
+class ShapeTypeMismatchError extends Error {}
+class UnknownShapeMessageError extends Error {}
 
 // interface
 export class Shape {
@@ -12,14 +17,14 @@ export class Shape {
   // @return boolean
   equals (shape) {
     if (!('type' in shape)) { // if 'shape' is null, exception is thrown anyway
-      throw 'Not a shape'
+      throw new NotAShapeError()
     } else if (shape.type !== this.type) {
-      throw 'Shape type mismatch'
+      throw new ShapeTypeMismatchError()
     }
   }
 
   toString () {
-    throw 'NotImplemented'
+    throw new NotImplementedError()
   }
 
   // return the intersected part of this shape with the viewport
@@ -28,14 +33,14 @@ export class Shape {
   //   - clipped object is it's (partly) inside the viewport
   //   - null if it's outside the viewport
   intersect (viewport) {
-    throw 'NotImplemented'
+    throw new NotImplementedError()
   }
 
   // draw this shape on the canvas
   // @param viewport: ViewPort
   // @param context: the canvas 2d context
   draw (viewport, context) {
-    throw 'NotImplemented'
+    throw new NotImplementedError()
   }
 }
 
@@ -65,12 +70,12 @@ export class PartialShape {
         next = this.feedText(message.data)
         break
       default:
-        throw `Unknown data: ${message.data}`
+        throw new UnknownShapeMessageError(`Unknown data: ${message.data}`)
     }
     return next
   }
   draw (viewport, context) {
-    throw 'NotImplemented'
+    throw new NotImplementedError()
   }
 }
 

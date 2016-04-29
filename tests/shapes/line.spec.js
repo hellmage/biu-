@@ -2,7 +2,7 @@ import proxyquire from 'proxyquire'
 import sinon from 'sinon'
 import { assert } from '../utils/assert'
 import { Fraction } from '../../src/math/fraction'
-import { ShapeType } from '../../src/shapes/shape'
+import { ShapeType, NotAShapeError, ShapeTypeMismatchError } from '../../src/shapes/shape'
 import { Point } from '../../src/shapes/point'
 import { Line, EmptyLine, OnePointLine, FixLengthLine } from '../../src/shapes/line'
 import { ViewPort } from '../../src/viewport'
@@ -123,10 +123,10 @@ describe('Line', function () {
       var l1 = new Line(p1, p2)
       assert.throws(function () {
         l1.equals({a: 1})
-      }, /Not a shape/)
+      }, NotAShapeError)
       assert.throws(function () {
         l1.equals({type: 'unknown'})
-      }, /mismatch/)
+      }, ShapeTypeMismatchError)
     })
   })
 })
